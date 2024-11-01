@@ -1,0 +1,8 @@
+Original repository link:
+https://github.com/laserpants/dotenv-cpp
+
+Changes:
+- downloaded source as zip and extracted it
+- copied dotenv.h from dotenv-cpp-master/include/laserpants/dotenv to root folder
+- renamed LICENSE to LICENSE.md
+- deleted all other files and folders except dotenv.h and LICENSE.md

@@ -32,6 +32,7 @@ set(EXT_MAGIC_ENUM_DIR "${CMAKE_SOURCE_DIR}/_external_shared/Magic_enum")
 set(EXT_STB_IMAGE_DIR "${CMAKE_SOURCE_DIR}/_external_shared/Stb_image")
 set(EXT_CURL_DIR "${CMAKE_SOURCE_DIR}/_external_shared/libcurl")
 set(EXT_DPP_DIR "${CMAKE_SOURCE_DIR}/_external_shared/dpp")
+set(EXT_DOTENV_DIR "${CMAKE_SOURCE_DIR}/_external_shared/dotenv-cpp")
 
 # Add GLAD
 add_library(glad STATIC ${EXT_GLAD_DIR}/glad.c)
@@ -84,6 +85,7 @@ target_include_directories(Discord_Github_Bot PRIVATE
 	${EXT_STB_IMAGE_DIR}
 	${EXT_CURL_DIR}/include
 	${EXT_DPP_DIR}/include
+	${EXT_DOTENV_DIR}
 )
 
 target_link_libraries(Discord_Github_Bot PRIVATE external_libs ${GLFW_LIBRARY_PATH} ${EXT_CURL_DIR}/libcurl_imp.lib ${EXT_DPP_DIR}/dpp.lib)

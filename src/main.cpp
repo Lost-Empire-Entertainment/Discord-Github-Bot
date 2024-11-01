@@ -1,13 +1,13 @@
-﻿#include <iostream>
+﻿//Copyright(C) 2024 Lost Empire Entertainment
 
-using std::cout;
-using std::cin;
+#include "core.hpp"
+
+using Core::Bot;
 
 int main()
 {
-	cout << "bbbb";
-
-	cin.get();
+	Bot::Initialize();
+	Bot::Run();
 
 	return 0;
 }

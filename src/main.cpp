@@ -5,7 +5,7 @@ using std::cin;
 
 int main()
 {
-	cout << "aaaa";
+	cout << "bbbb";
 
 	cin.get();
 

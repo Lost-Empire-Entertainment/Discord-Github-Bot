@@ -1,0 +1,7 @@
+# Discord Github Bot ignored files and folders
+build/
+.vs/
+out/
+
+# Ignore critical data environment file that holds info for paths, discord bot key etc
+data.env

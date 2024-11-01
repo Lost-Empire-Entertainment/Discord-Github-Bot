@@ -1,0 +1,16 @@
+Original repository link:
+https://github.com/brainboxdotcc/DPP
+
+Changes:
+- downloaded dpp zip package and extracted it
+- launched cmake gui
+- set folder where cmakelists.txt for dpp is inside of as source code folder
+- set build folder as new empty folder named build inside dpp folder
+- clicked configure
+- clicked generate
+- launched libdpp.sln from build folder
+- changed to x64 Release
+- right-clicked dpp and clicked properties and set C++ version to 20
+- right-clicked dpp and clicked Build
+- copied dpp.dll and dpp.lib from DPP-10.3.34/build/library/Release to the root folder
+- copied all the header files from DPP-10.3.34/include/dpp into a new empty include folder and deleted everything else

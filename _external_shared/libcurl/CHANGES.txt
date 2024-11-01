@@ -1,0 +1,16 @@
+Original repository link:
+https://github.com/curl/curl
+
+Changes:
+- downloaded curl zip package and extracted it
+- launched cmake gui
+- set folder where cmakelists.txt for curl is inside of as source code folder
+- set build folder as new empty folder named build inside libcurl folder
+- clicked configure
+- clicked generate
+- launched CURL.sln from build folder
+- changed to x64 Release
+- right-clicked libcurl and clicked properties and set C++ version to 20
+- right-clicked libcurl and clicked Build
+- copied libcurl.dll and libcurl_imp.lib from curl-8.10.1/build/lib/Release to the root folder
+- copied all the header files from curl-8.10.1/include/curl into a new empty include folder and deleted everything else

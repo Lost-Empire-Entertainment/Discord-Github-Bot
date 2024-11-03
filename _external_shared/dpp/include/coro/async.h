@@ -20,9 +20,9 @@
  ************************************************************************************/
 #pragma once
 
-#include <dpp/utility.h>
+#include <dpp/include/utility.h>
 
-#include <dpp/coro/awaitable.h>
+#include <dpp/include/coro/awaitable.h>
 
 namespace dpp {
 

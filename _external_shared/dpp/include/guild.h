@@ -19,17 +19,17 @@
  *
  ************************************************************************************/
 #pragma once
-#include <dpp/export.h>
-#include <dpp/user.h>
-#include <dpp/emoji.h>
-#include <dpp/snowflake.h>
-#include <dpp/managed.h>
-#include <dpp/utility.h>
-#include <dpp/voicestate.h>
-#include <dpp/permissions.h>
+#include <dpp/include/export.h>
+#include <dpp/include/user.h>
+#include <dpp/include/emoji.h>
+#include <dpp/include/snowflake.h>
+#include <dpp/include/managed.h>
+#include <dpp/include/utility.h>
+#include <dpp/include/voicestate.h>
+#include <dpp/include/permissions.h>
 #include <string>
 #include <unordered_map>
-#include <dpp/json_interface.h>
+#include <dpp/include/json_interface.h>
 
 namespace dpp {
 

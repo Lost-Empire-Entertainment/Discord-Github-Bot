@@ -23,7 +23,7 @@
 
 #include <iostream>
 
-#include <dpp/utility.h>
+#include <dpp/include/utility.h>
 
 namespace dpp {
 
@@ -35,7 +35,7 @@ struct awaitable_dummy {
 
 #ifdef DPP_CORO
 
-#include <dpp/coro/coro.h>
+#include <dpp/include/coro/coro.h>
 
 // Do not include <coroutine> as coro.h includes <experimental/coroutine> or <coroutine> depending on clang version
 #include <mutex>
@@ -703,7 +703,7 @@ bool awaitable<T>::awaiter<Derived>::await_ready() const {
 
 }
 
-#include <dpp/coro/job.h>
+#include <dpp/include/coro/job.h>
 
 namespace dpp {
 

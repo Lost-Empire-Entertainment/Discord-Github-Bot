@@ -20,11 +20,11 @@
  *
  ************************************************************************************/
 #pragma once
-#include <dpp/export.h>
-#include <dpp/misc-enum.h>
+#include <dpp/include/export.h>
+#include <dpp/include/misc-enum.h>
 #include <string>
 #include <functional>
-#include <dpp/socket.h>
+#include <dpp/include/socket.h>
 #include <cstdint>
 
 namespace dpp {

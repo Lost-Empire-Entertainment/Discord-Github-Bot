@@ -21,14 +21,14 @@
  ************************************************************************************/
 
 #pragma once
-#include <dpp/export.h>
+#include <dpp/include/export.h>
 #include <string>
 #include <map>
 #include <vector>
-#include <dpp/json_fwd.h>
-#include <dpp/wsclient.h>
-#include <dpp/dispatcher.h>
-#include <dpp/event.h>
+#include <dpp/include/json_fwd.h>
+#include <dpp/include/wsclient.h>
+#include <dpp/include/dispatcher.h>
+#include <dpp/include/event.h>
 #include <queue>
 #include <thread>
 #include <deque>

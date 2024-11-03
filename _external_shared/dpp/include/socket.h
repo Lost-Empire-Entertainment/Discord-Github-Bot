@@ -21,7 +21,7 @@
  ************************************************************************************/
 #pragma once
 
-#include <dpp/export.h>
+#include <dpp/include/export.h>
 #ifdef _WIN32
 	#include <WinSock2.h>
 	#include <WS2tcpip.h>

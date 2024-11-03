@@ -20,9 +20,9 @@
  *
  ************************************************************************************/
 #pragma once
-#include <dpp/export.h>
-#include <dpp/snowflake.h>
-#include <dpp/json_fwd.h>
+#include <dpp/include/export.h>
+#include <dpp/include/snowflake.h>
+#include <dpp/include/json_fwd.h>
 
 #define event_decl(x,wstype) /** @brief Internal event handler for wstype websocket events. Called for each websocket message of this type. @internal */ \
 	class x : public event { public: virtual void handle(class dpp::discord_client* client, nlohmann::json &j, const std::string &raw); };

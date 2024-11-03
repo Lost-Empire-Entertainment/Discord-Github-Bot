@@ -21,11 +21,11 @@
  ************************************************************************************/
 
 #pragma once
-#include <dpp/export.h>
-#include <dpp/snowflake.h>
-#include <dpp/managed.h>
-#include <dpp/channel.h>
-#include <dpp/message.h>
+#include <dpp/include/export.h>
+#include <dpp/include/snowflake.h>
+#include <dpp/include/managed.h>
+#include <dpp/include/channel.h>
+#include <dpp/include/message.h>
 
 namespace dpp {
 

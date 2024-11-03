@@ -21,21 +21,21 @@
 
 #pragma once
 
-#include <dpp/export.h>
+#include <dpp/include/export.h>
 #include <string>
 #include <map>
 #include <variant>
-#include <dpp/snowflake.h>
-#include <dpp/misc-enum.h>
-#include <dpp/json_fwd.h>
+#include <dpp/include/snowflake.h>
+#include <dpp/include/misc-enum.h>
+#include <dpp/include/json_fwd.h>
 #include <algorithm>
 #include <mutex>
 #include <shared_mutex>
 #include <cstring>
 #include <atomic>
-#include <dpp/exception.h>
-#include <dpp/coro/job.h>
-#include <dpp/coro/task.h>
+#include <dpp/include/exception.h>
+#include <dpp/include/coro/job.h>
+#include <dpp/include/coro/task.h>
 
 namespace dpp {
 

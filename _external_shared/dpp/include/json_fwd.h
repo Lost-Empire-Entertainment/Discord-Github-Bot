@@ -22,7 +22,7 @@
 #ifdef DPP_USE_EXTERNAL_JSON
 	#include <nlohmann/json_fwd.hpp>
 #else
-	#include <dpp/nlohmann/json_fwd.hpp>
+	#include <dpp/include/nlohmann/json_fwd.hpp>
 #endif
 
 namespace dpp {

@@ -20,10 +20,10 @@
  ************************************************************************************/
 #pragma once
 
-#include <dpp/export.h>
-#include <dpp/json_fwd.h>
-#include <dpp/json_interface.h>
-#include <dpp/utility.h>
+#include <dpp/include/export.h>
+#include <dpp/include/json_fwd.h>
+#include <dpp/include/json_interface.h>
+#include <dpp/include/utility.h>
 #include <string_view>
 #include <functional>
 

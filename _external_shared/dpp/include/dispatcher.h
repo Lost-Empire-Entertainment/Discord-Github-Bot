@@ -20,30 +20,30 @@
  *
  ************************************************************************************/
 #pragma once
-#include <dpp/export.h>
-#include <dpp/snowflake.h>
-#include <dpp/misc-enum.h>
-#include <dpp/managed.h>
-#include <dpp/utility.h>
-#include <dpp/role.h>
-#include <dpp/user.h>
-#include <dpp/channel.h>
-#include <dpp/thread.h>
-#include <dpp/guild.h>
-#include <dpp/invite.h>
-#include <dpp/emoji.h>
-#include <dpp/ban.h>
-#include <dpp/automod.h>
-#include <dpp/webhook.h>
-#include <dpp/presence.h>
-#include <dpp/message.h>
-#include <dpp/appcommand.h>
-#include <dpp/application.h>
-#include <dpp/scheduled_event.h>
-#include <dpp/stage_instance.h>
-#include <dpp/integration.h>
-#include <dpp/auditlog.h>
-#include <dpp/entitlement.h>
+#include <dpp/include/export.h>
+#include <dpp/include/snowflake.h>
+#include <dpp/include/misc-enum.h>
+#include <dpp/include/managed.h>
+#include <dpp/include/utility.h>
+#include <dpp/include/role.h>
+#include <dpp/include/user.h>
+#include <dpp/include/channel.h>
+#include <dpp/include/thread.h>
+#include <dpp/include/guild.h>
+#include <dpp/include/invite.h>
+#include <dpp/include/emoji.h>
+#include <dpp/include/ban.h>
+#include <dpp/include/automod.h>
+#include <dpp/include/webhook.h>
+#include <dpp/include/presence.h>
+#include <dpp/include/message.h>
+#include <dpp/include/appcommand.h>
+#include <dpp/include/application.h>
+#include <dpp/include/scheduled_event.h>
+#include <dpp/include/stage_instance.h>
+#include <dpp/include/integration.h>
+#include <dpp/include/auditlog.h>
+#include <dpp/include/entitlement.h>
 #include <functional>
 #include <variant>
 #include <exception>
@@ -51,7 +51,7 @@
 #include <string>
 
 #ifdef DPP_CORO
-#include <dpp/coro.h>
+#include <dpp/include/coro.h>
 #endif /* DPP_CORO */
 
 namespace dpp {

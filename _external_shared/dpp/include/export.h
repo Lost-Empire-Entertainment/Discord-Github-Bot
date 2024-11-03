@@ -38,7 +38,7 @@
 	#ifdef DPP_BUILD
 		/* Building the library */
 		#ifdef _WIN32
-			#include <dpp/win32_safe_warnings.h>
+			#include <dpp/include/win32_safe_warnings.h>
 			#define DPP_EXPORT __declspec(dllexport)
 		#else
 			#define DPP_EXPORT
@@ -54,7 +54,7 @@
 #else
 	/* Static linked build */
 	#if defined(_WIN32) && defined(DPP_BUILD)
-		#include <dpp/win32_safe_warnings.h>
+		#include <dpp/include/win32_safe_warnings.h>
 	#endif
 	#define DPP_EXPORT
 #endif

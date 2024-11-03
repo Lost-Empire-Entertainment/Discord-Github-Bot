@@ -21,9 +21,9 @@
  ************************************************************************************/
 
 #pragma once
-#include <dpp/export.h>
-#include <dpp/snowflake.h>
-#include <dpp/managed.h>
+#include <dpp/include/export.h>
+#include <dpp/include/snowflake.h>
+#include <dpp/include/managed.h>
 #include <unordered_map>
 #include <mutex>
 #include <shared_mutex>

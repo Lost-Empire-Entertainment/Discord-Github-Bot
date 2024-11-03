@@ -20,8 +20,8 @@
  ************************************************************************************/
 #pragma once
 
-#include <dpp/export.h>
-#include <dpp/cluster.h>
+#include <dpp/include/export.h>
+#include <dpp/include/cluster.h>
 #include <time.h>
 #include <map>
 #include <functional>

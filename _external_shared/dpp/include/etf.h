@@ -33,9 +33,9 @@
  ************************************************************************************/
 
 #pragma once
-#include <dpp/export.h>
-#include <dpp/snowflake.h>
-#include <dpp/json_fwd.h>
+#include <dpp/include/export.h>
+#include <dpp/include/snowflake.h>
+#include <dpp/include/json_fwd.h>
 
 namespace dpp {
 

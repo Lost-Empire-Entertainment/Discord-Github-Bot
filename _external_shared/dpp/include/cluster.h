@@ -21,33 +21,33 @@
 
 #pragma once
 
-#include <dpp/export.h>
+#include <dpp/include/export.h>
 #include <string>
 #include <map>
 #include <variant>
-#include <dpp/snowflake.h>
-#include <dpp/dispatcher.h>
-#include <dpp/misc-enum.h>
-#include <dpp/timer.h>
-#include <dpp/json_fwd.h>
-#include <dpp/discordclient.h>
-#include <dpp/discordvoiceclient.h>
-#include <dpp/voiceregion.h>
-#include <dpp/dtemplate.h>
-#include <dpp/prune.h>
-#include <dpp/auditlog.h>
-#include <dpp/queues.h>
-#include <dpp/cache.h>
-#include <dpp/intents.h>
-#include <dpp/discordevents.h>
-#include <dpp/sync.h>
+#include <dpp/include/snowflake.h>
+#include <dpp/include/dispatcher.h>
+#include <dpp/include/misc-enum.h>
+#include <dpp/include/timer.h>
+#include <dpp/include/json_fwd.h>
+#include <dpp/include/discordclient.h>
+#include <dpp/include/discordvoiceclient.h>
+#include <dpp/include/voiceregion.h>
+#include <dpp/include/dtemplate.h>
+#include <dpp/include/prune.h>
+#include <dpp/include/auditlog.h>
+#include <dpp/include/queues.h>
+#include <dpp/include/cache.h>
+#include <dpp/include/intents.h>
+#include <dpp/include/discordevents.h>
+#include <dpp/include/sync.h>
 #include <algorithm>
 #include <iostream>
 #include <shared_mutex>
 #include <cstring>
-#include <dpp/restresults.h>
-#include <dpp/event_router.h>
-#include <dpp/coro/async.h>
+#include <dpp/include/restresults.h>
+#include <dpp/include/event_router.h>
+#include <dpp/include/coro/async.h>
 
 namespace dpp {
 
@@ -3975,9 +3975,9 @@ public:
 	 */
 	void channel_set_voice_status(snowflake channel_id, const std::string& status, command_completion_event_t callback = utility::log_error());
 
-#include <dpp/cluster_sync_calls.h>
+#include <dpp/include/cluster_sync_calls.h>
 #ifdef DPP_CORO
-#include <dpp/cluster_coro_calls.h>
+#include <dpp/include/cluster_coro_calls.h>
 #endif
 
 };

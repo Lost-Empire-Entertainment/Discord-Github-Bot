@@ -21,12 +21,12 @@
  ************************************************************************************/
 #pragma once
 #include <variant>
-#include <dpp/export.h>
-#include <dpp/managed.h>
-#include <dpp/json_fwd.h>
-#include <dpp/permissions.h>
-#include <dpp/guild.h>
-#include <dpp/json_interface.h>
+#include <dpp/include/export.h>
+#include <dpp/include/managed.h>
+#include <dpp/include/json_fwd.h>
+#include <dpp/include/permissions.h>
+#include <dpp/include/guild.h>
+#include <dpp/include/json_interface.h>
 
 namespace dpp {
 

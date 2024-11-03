@@ -19,19 +19,19 @@
  *
  ************************************************************************************/
 #pragma once
-#include <dpp/integration.h>
-#include <dpp/export.h>
-#include <dpp/snowflake.h>
-#include <dpp/managed.h>
-#include <dpp/message.h>
-#include <dpp/channel.h>
-#include <dpp/role.h>
-#include <dpp/user.h>
-#include <dpp/entitlement.h>
+#include <dpp/include/integration.h>
+#include <dpp/include/export.h>
+#include <dpp/include/snowflake.h>
+#include <dpp/include/managed.h>
+#include <dpp/include/message.h>
+#include <dpp/include/channel.h>
+#include <dpp/include/role.h>
+#include <dpp/include/user.h>
+#include <dpp/include/entitlement.h>
 #include <variant>
 #include <map>
-#include <dpp/json_fwd.h>
-#include <dpp/json_interface.h>
+#include <dpp/include/json_fwd.h>
+#include <dpp/include/json_interface.h>
 
 namespace dpp {
 

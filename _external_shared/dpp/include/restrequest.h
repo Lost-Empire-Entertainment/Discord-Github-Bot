@@ -19,11 +19,11 @@
  *
  ************************************************************************************/
 #pragma once
-#include <dpp/export.h>
-#include <dpp/snowflake.h>
-#include <dpp/cluster.h>
-#include <dpp/invite.h>
-#include <dpp/json_fwd.h>
+#include <dpp/include/export.h>
+#include <dpp/include/snowflake.h>
+#include <dpp/include/cluster.h>
+#include <dpp/include/invite.h>
+#include <dpp/include/json_fwd.h>
 
 namespace dpp {
 

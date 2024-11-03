@@ -14,3 +14,4 @@ Changes:
 - right-clicked dpp and clicked Build
 - copied dpp.dll and dpp.lib from DPP-10.3.34/build/library/Release to the root folder
 - copied all the header files from DPP-10.3.34/include/dpp into a new empty include folder and deleted everything else
+- replaced dpp/ with dpp/include in all dpp source files that had dpp/ in its #include

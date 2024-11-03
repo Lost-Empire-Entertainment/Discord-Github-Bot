@@ -9,8 +9,8 @@ namespace dpp {
  *
  * @warning If you want to use this, you have to pull the header in separately. For example:
  * ```cpp
- * #include <dpp/dpp.h>
- * #include <dpp/unicode_emoji.h>
+ * #include <dpp/include/dpp.h>
+ * #include <dpp/include/unicode_emoji.h>
  * ```
  */
 namespace unicode_emoji {

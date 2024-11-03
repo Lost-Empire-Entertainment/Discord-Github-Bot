@@ -20,9 +20,9 @@
  *
  ************************************************************************************/
 #pragma once
-#include <dpp/export.h>
-#include <dpp/snowflake.h>
-#include <dpp/misc-enum.h>
+#include <dpp/include/export.h>
+#include <dpp/include/snowflake.h>
+#include <dpp/include/misc-enum.h>
 #include <string>
 #include <vector>
 #include <unordered_map>

@@ -20,10 +20,10 @@
  *
  ************************************************************************************/
 #pragma once
-#include <dpp/export.h>
+#include <dpp/include/export.h>
 #include <string>
 #include <map>
-#include <dpp/sslclient.h>
+#include <dpp/include/sslclient.h>
 
 namespace dpp {
 

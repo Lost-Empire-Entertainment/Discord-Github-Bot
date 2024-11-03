@@ -19,12 +19,12 @@
  *
  ************************************************************************************/
 #pragma once
-#include <dpp/export.h>
-#include <dpp/json_fwd.h>
-#include <dpp/snowflake.h>
-#include <dpp/managed.h>
-#include <dpp/utility.h>
-#include <dpp/json_interface.h>
+#include <dpp/include/export.h>
+#include <dpp/include/json_fwd.h>
+#include <dpp/include/snowflake.h>
+#include <dpp/include/managed.h>
+#include <dpp/include/utility.h>
+#include <dpp/include/json_interface.h>
 
 namespace dpp {
 

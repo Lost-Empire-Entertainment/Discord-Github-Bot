@@ -20,8 +20,8 @@
  ************************************************************************************/
 
 #pragma once
-#include <dpp/export.h>
-#include <dpp/json.h>
+#include <dpp/include/export.h>
+#include <dpp/include/json.h>
 
 namespace dpp {
 

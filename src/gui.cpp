@@ -16,6 +16,7 @@
 #include "core.hpp"
 #include "render.hpp"
 #include "configfile.hpp"
+#include "bot.hpp"
 
 using std::string;
 using std::cout;
@@ -23,6 +24,7 @@ using std::cout;
 using Core::Bot;
 using Graphics::Render;
 using Core::ConfigFile;
+using Core::BotMechanics;
 
 namespace Graphics::GUI
 {
@@ -130,7 +132,7 @@ namespace Graphics::GUI
 	{
 		if (ImGui::Button("123"))
 		{
-			cout << "456";
+			BotMechanics::SendDiscordMessage();
 		}
 
 		ImGui::End();

@@ -21,8 +21,8 @@
  ************************************************************************************/
 
 #pragma once
-#include <dpp/export.h>
-#include <dpp/snowflake.h>
+#include <dpp/include/export.h>
+#include <dpp/include/snowflake.h>
 #include <memory>
 
 namespace dpp {

@@ -20,17 +20,17 @@
  ************************************************************************************/
 
 #pragma once
-#include <dpp/export.h>
-#include <dpp/snowflake.h>
-#include <dpp/misc-enum.h>
-#include <dpp/user.h>
-#include <dpp/guild.h>
-#include <dpp/role.h>
-#include <dpp/appcommand.h>
-#include <dpp/dispatcher.h>
-#include <dpp/utility.h>
-#include <dpp/json_fwd.h>
-#include <dpp/event_router.h>
+#include <dpp/include/export.h>
+#include <dpp/include/snowflake.h>
+#include <dpp/include/misc-enum.h>
+#include <dpp/include/user.h>
+#include <dpp/include/guild.h>
+#include <dpp/include/role.h>
+#include <dpp/include/appcommand.h>
+#include <dpp/include/dispatcher.h>
+#include <dpp/include/utility.h>
+#include <dpp/include/json_fwd.h>
+#include <dpp/include/event_router.h>
 #include <unordered_map>
 #include <vector>
 #include <functional>

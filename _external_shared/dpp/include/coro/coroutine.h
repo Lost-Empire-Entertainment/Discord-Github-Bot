@@ -20,7 +20,7 @@
  ************************************************************************************/
 #pragma once
 
-#include <dpp/utility.h>
+#include <dpp/include/utility.h>
 
 namespace dpp {
 
@@ -32,8 +32,8 @@ struct coroutine_dummy {
 
 #ifdef DPP_CORO
 
-#include <dpp/coro/coro.h>
-#include <dpp/coro/awaitable.h>
+#include <dpp/include/coro/coro.h>
+#include <dpp/include/coro/awaitable.h>
 
 #include <optional>
 #include <type_traits>

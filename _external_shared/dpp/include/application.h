@@ -21,16 +21,16 @@
  ************************************************************************************/
 
 #pragma once
-#include <dpp/integration.h>
-#include <dpp/export.h>
-#include <dpp/snowflake.h>
-#include <dpp/managed.h>
-#include <dpp/utility.h>
-#include <dpp/user.h>
-#include <dpp/guild.h>
-#include <dpp/permissions.h>
-#include <dpp/json_fwd.h>
-#include <dpp/json_interface.h>
+#include <dpp/include/integration.h>
+#include <dpp/include/export.h>
+#include <dpp/include/snowflake.h>
+#include <dpp/include/managed.h>
+#include <dpp/include/utility.h>
+#include <dpp/include/user.h>
+#include <dpp/include/guild.h>
+#include <dpp/include/permissions.h>
+#include <dpp/include/json_fwd.h>
+#include <dpp/include/json_interface.h>
 #include <map>
 #include <optional>
 

@@ -20,9 +20,9 @@
  *
  ************************************************************************************/
 #pragma once
-#include <dpp/export.h>
-#include <dpp/json_fwd.h>
-#include <dpp/exception.h>
+#include <dpp/include/export.h>
+#include <dpp/include/json_fwd.h>
+#include <dpp/include/exception.h>
 #include <cstdint>
 #include <type_traits>
 

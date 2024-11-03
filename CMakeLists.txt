@@ -84,7 +84,7 @@ target_include_directories(Discord_Github_Bot PRIVATE
 	${EXT_IMGUI_DIR}
 	${EXT_STB_IMAGE_DIR}
 	${EXT_CURL_DIR}/include
-	${EXT_DPP_DIR}/include
+	${EXT_DPP_DIR}
 	${EXT_DOTENV_DIR}
 )
 

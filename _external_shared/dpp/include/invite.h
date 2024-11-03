@@ -20,15 +20,15 @@
  *
  ************************************************************************************/
 #pragma once
-#include <dpp/export.h>
-#include <dpp/snowflake.h>
-#include <dpp/json_fwd.h>
-#include <dpp/stage_instance.h>
+#include <dpp/include/export.h>
+#include <dpp/include/snowflake.h>
+#include <dpp/include/json_fwd.h>
+#include <dpp/include/stage_instance.h>
 #include <unordered_map>
-#include <dpp/json_interface.h>
-#include <dpp/channel.h>
-#include <dpp/user.h>
-#include <dpp/guild.h>
+#include <dpp/include/json_interface.h>
+#include <dpp/include/channel.h>
+#include <dpp/include/user.h>
+#include <dpp/include/guild.h>
 
 namespace dpp {
 

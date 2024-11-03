@@ -18,10 +18,10 @@
 #include "core.hpp"
 #include "render.hpp"
 #include "gui.hpp"
-#include "console.hpp"
 #include "fileutils.hpp"
 #include "stringutils.hpp"
 #include "configfile.hpp"
+#include "bot.hpp"
 
 using std::cout;
 using std::wstring;
@@ -31,7 +31,6 @@ using std::quick_exit;
 
 using Graphics::Render;
 using Graphics::GUI::BotGUI;
-using Graphics::GUI::Console;
 using Utils::String;
 using Utils::File;
 
@@ -132,6 +131,8 @@ namespace Core
 		}
 
 		Render::RenderInitialize();
+
+		BotMechanics::Initialize();
 	}
 
 	string Bot::GetEnv(const string& envVariable)

@@ -19,7 +19,7 @@
  *
  ************************************************************************************/
 #pragma once
-#include <dpp/export.h>
+#include <dpp/include/export.h>
 #ifdef _WIN32
 #include <WinSock2.h>
 #include <WS2tcpip.h>
@@ -32,7 +32,7 @@
 #include <string>
 #include <unordered_map>
 #include <cstring>
-#include <dpp/socket.h>
+#include <dpp/include/socket.h>
 
 namespace dpp {
 

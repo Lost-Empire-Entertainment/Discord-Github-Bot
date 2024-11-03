@@ -20,7 +20,7 @@
  ************************************************************************************/
 #pragma once
 
-#include <dpp/export.h>
+#include <dpp/include/export.h>
 #include <numeric>
 #include <cstdint>
 #include <limits>

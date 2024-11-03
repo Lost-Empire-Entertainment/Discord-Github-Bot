@@ -21,14 +21,14 @@
  ************************************************************************************/
 
 #pragma once
-#include <dpp/export.h>
-#include <dpp/snowflake.h>
-#include <dpp/managed.h>
-#include <dpp/utility.h>
-#include <dpp/voicestate.h>
-#include <dpp/json_fwd.h>
-#include <dpp/permissions.h>
-#include <dpp/json_interface.h>
+#include <dpp/include/export.h>
+#include <dpp/include/snowflake.h>
+#include <dpp/include/managed.h>
+#include <dpp/include/utility.h>
+#include <dpp/include/voicestate.h>
+#include <dpp/include/json_fwd.h>
+#include <dpp/include/permissions.h>
+#include <dpp/include/json_interface.h>
 #include <unordered_map>
 #include <variant>
 

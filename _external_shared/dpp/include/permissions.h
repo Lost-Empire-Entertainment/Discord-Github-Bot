@@ -19,8 +19,8 @@
  *
  ************************************************************************************/
 #pragma once
-#include <dpp/export.h>
-#include <dpp/json.h>
+#include <dpp/include/export.h>
+#include <dpp/include/json.h>
 #include <cstdint>
 #include <type_traits>
 

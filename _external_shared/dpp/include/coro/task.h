@@ -20,8 +20,8 @@
  ************************************************************************************/
 #pragma once
 
-#include <dpp/utility.h>
-#include <dpp/coro/awaitable.h>
+#include <dpp/include/utility.h>
+#include <dpp/include/coro/awaitable.h>
 
 namespace dpp {
 
@@ -33,7 +33,7 @@ struct task_dummy : awaitable_dummy {
 
 #ifdef DPP_CORO
 
-#include <dpp/coro/coro.h>
+#include <dpp/include/coro/coro.h>
 
 #include <utility>
 #include <type_traits>

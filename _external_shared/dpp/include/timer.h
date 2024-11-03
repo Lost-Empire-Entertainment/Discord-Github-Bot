@@ -21,7 +21,7 @@
  ************************************************************************************/
 
 #pragma once
-#include <dpp/export.h>
+#include <dpp/include/export.h>
 #include <stdint.h>
 #include <map>
 #include <unordered_map>

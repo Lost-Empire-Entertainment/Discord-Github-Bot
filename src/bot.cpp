@@ -44,9 +44,9 @@ namespace Core
 
 		//event handler for when the bot is ready
 		bot->on_ready([&](const dpp::ready_t& event)
-			{
-				cout << "Bot is ready and conencted!\n";
-			});
+		{
+			cout << "Bot is ready and conencted!\n";
+		});
 
 		//run the bot in a separate thread in non-blocking mode
 		botThread = thread([]() 
@@ -58,13 +58,13 @@ namespace Core
 	void BotMechanics::SendDiscordMessage(const string& channelID, const string& message)
 	{
 		dpp::snowflake convertedChannelID = static_cast<dpp::snowflake>(stoull(channelID));
-
-		if (!bot) cout << "Error: Bot not initialized!\n";
-		else bot->message_create(dpp::message(convertedChannelID, message));
+		bot->message_create(dpp::message(convertedChannelID, message));
 	}
 
 	void BotMechanics::Shutdown()
 	{
+		bot->shutdown();
+
 		if (botThread.joinable()) 
 		{
 			botThread.join();

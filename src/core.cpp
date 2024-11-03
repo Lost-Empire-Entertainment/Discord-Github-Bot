@@ -28,7 +28,6 @@ using std::wstring;
 using std::filesystem::exists;
 using std::filesystem::current_path;
 using std::quick_exit;
-using std::exit;
 
 using Graphics::Render;
 using Graphics::GUI::BotGUI;
@@ -41,12 +40,17 @@ namespace Core
 	void Bot::Initialize()
 	{
 		//initialize dotenv
-		dotenv::init();
+		string envPath = current_path().string() + "\\data.env";
+		if (!exists(envPath))
+		{
+			CreateErrorPopup(("Failed to find env file at '" + envPath + "'!").c_str());
+		}
+		dotenv::init(envPath.c_str());
 
 		exeName = GetEnv("BOT_EXE_NAME");
 		if (exeName == "")
 		{
-			CreateErrorPopup("Failed to get exe name from env file! Did you forget to create one?");
+			CreateErrorPopup("Failed to get exe name from env file! Did you forget to add the BOT_EXE_NAME variable?");
 		}
 
 		version = GetEnv("BOT_EXE_VERSION");
@@ -102,7 +106,7 @@ namespace Core
 
 			docsPath = String::CharReplace(
 				string(narrowPath.begin(), narrowPath.end()), '/', '\\') +
-				"\\Compiler";
+				"\\" + exeName;
 
 			if (!exists(docsPath)) File::CreateNewFolder(docsPath);
 
@@ -215,7 +219,7 @@ namespace Core
 
 		int result = MessageBoxA(nullptr, errorMessage, title.c_str(), MB_ICONERROR | MB_OK);
 
-		if (result == IDOK) Shutdown(true);
+		if (result == IDOK) Shutdown();
 	}
 
 	void Bot::Run()
@@ -246,39 +250,16 @@ namespace Core
 		return false;
 	}
 
-	void Bot::Shutdown(bool immediate)
+	void Bot::Shutdown()
 	{
-		if (immediate)
-		{
-			isBotRunning = false;
+		cout << "Shutting down bot...\n";
 
-			BotGUI::Shutdown();
+		isBotRunning = false;
 
-			glfwTerminate();
+		if (configFilePath != "") ConfigFile::SaveData();
+		BotGUI::Shutdown();
+		glfwTerminate();
 
-			quick_exit(EXIT_SUCCESS);
-		}
-		else
-		{
-			isBotRunning = false;
-
-			ConfigFile::SaveData();
-
-			BotGUI::Shutdown();
-
-			//clean all glfw resources after program is closed
-			glfwTerminate();
-
-			cout << "\n==================================================\n"
-				<< "\n"
-				<< "EXITED BOT\n"
-				<< "\n"
-				<< "==================================================\n"
-				<< ".\n"
-				<< ".\n"
-				<< ".\n\n";
-
-			exit(EXIT_SUCCESS);
-		}
+		quick_exit(EXIT_SUCCESS);
 	}
 }

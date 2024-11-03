@@ -109,6 +109,15 @@ target_compile_definitions(Discord_Github_Bot PRIVATE GLFW_INCLUDE_NONE)
 set(CMAKE_INSTALL_BINDIR bin)
 install(TARGETS Discord_Github_Bot DESTINATION ${CMAKE_INSTALL_BINDIR})
 
+# Copy "data.env" to install directory after build
+add_custom_command(TARGET Discord_Github_Bot POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E remove
+    $<TARGET_FILE_DIR:Discord_Github_Bot>/data.env
+	COMMAND ${CMAKE_COMMAND} -E copy
+    ${CMAKE_SOURCE_DIR}/data.env
+    $<TARGET_FILE_DIR:Discord_Github_Bot>/data.env
+)
+
 # Copy libcurl.dll to the output directory after build (Windows specific)
 add_custom_command(TARGET Discord_Github_Bot POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E remove

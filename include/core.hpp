@@ -30,6 +30,6 @@ namespace Core
 
 		static bool IsUserIdle();
 
-		static void Shutdown(bool immediate = false);
+		static void Shutdown();
 	};
 }

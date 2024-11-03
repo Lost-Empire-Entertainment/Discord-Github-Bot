@@ -130,7 +130,7 @@ add_custom_command(TARGET Discord_Github_Bot POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E remove
     $<TARGET_FILE_DIR:Discord_Github_Bot>/dpp.dll
 	COMMAND ${CMAKE_COMMAND} -E copy
-    ${EXT_DPP_DIR}/dpp.dll
+    ${EXT_DPP_DIR}/$<CONFIG>/dpp.dll
     $<TARGET_FILE_DIR:Discord_Github_Bot>/dpp.dll
 )
 

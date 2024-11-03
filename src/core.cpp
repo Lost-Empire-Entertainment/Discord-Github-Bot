@@ -258,6 +258,7 @@ namespace Core
 		isBotRunning = false;
 
 		if (configFilePath != "") ConfigFile::SaveData();
+		BotMechanics::Shutdown();
 		BotGUI::Shutdown();
 		glfwTerminate();
 

@@ -3,5 +3,6 @@ build/
 .vs/
 out/
 
-# Ignore critical data environment file that holds info for paths, discord bot key etc
+# Ignore important files the repository shouldnt have
 data.env
+info.txt

@@ -10,6 +10,9 @@
 #include "imgui_impl_opengl3.h"
 #include "imgui_internal.h"
 #include "glfw3.h"
+#pragma warning(push, 0) //start dpp warning ignore
+#include "dpp/include/dpp.h"
+#pragma warning(pop) //end dpp warning ignore
 
 //bot
 #include "gui.hpp"
@@ -132,7 +135,9 @@ namespace Graphics::GUI
 	{
 		if (ImGui::Button("123"))
 		{
-			BotMechanics::SendDiscordMessage();
+			string channelID = BotMechanics::channelID;
+			string message = "i like windows";
+			BotMechanics::SendDiscordMessage(channelID, message);
 		}
 
 		ImGui::End();

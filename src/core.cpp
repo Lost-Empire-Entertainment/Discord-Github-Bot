@@ -110,7 +110,7 @@ namespace Core
 
 			if (!exists(docsPath)) File::CreateNewFolder(docsPath);
 
-			cout << "Compiler documents path: " << docsPath << "\n";
+			cout << exeName << " documents path: " << docsPath << "\n";
 
 			filesPath = current_path().generic_string() + "\\files";
 			filesPath = String::CharReplace(filesPath, '/', '\\');

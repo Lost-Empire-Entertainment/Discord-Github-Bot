@@ -46,7 +46,7 @@ namespace Graphics
 		cout << "Creating window...\n";
 
 		//create a window object holding all the windowing data
-		string name = "Compiler | Elypso hub";
+		string name = Bot::exeName + " " + Bot::version;
 		window = glfwCreateWindow(
 			1000,
 			1000,

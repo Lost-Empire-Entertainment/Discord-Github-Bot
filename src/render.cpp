@@ -31,19 +31,19 @@ namespace Graphics
 
 	void Render::GLFWSetup()
 	{
-		cout << "Initializing GLFW...\n";
+		BotGUI::Print("Initializing GLFW...", BotGUI::MessageTarget::cmdOnly);
 
 		glfwInit();
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-		cout << "GLFW initialized successfully!\n\n";
+		BotGUI::Print("GLFW initialized successfully!", BotGUI::MessageTarget::cmdOnly, 1);
 	}
 
 	void Render::WindowSetup()
 	{
-		cout << "Creating window...\n";
+		BotGUI::Print("Creating window...", BotGUI::MessageTarget::cmdOnly);
 
 		//create a window object holding all the windowing data
 		string name = Bot::exeName + " " + Bot::version;
@@ -54,11 +54,7 @@ namespace Graphics
 			NULL,
 			NULL);
 
-		if (window == NULL)
-		{
-			cout << "Failed to create GLFW window!\n\n";
-			return;
-		}
+		if (window == NULL) Bot::CreateErrorPopup("Failed to create GLFW window!");
 
 		glfwMakeContextCurrent(window);
 		glfwSetFramebufferSizeCallback(window, UpdateAfterRescale);
@@ -80,21 +76,20 @@ namespace Graphics
 
 		glfwSetWindowCloseCallback(window, [](GLFWwindow* window) { Bot::Shutdown(); });
 
-		cout << "Window initialized successfully!\n\n";
+		BotGUI::Print("Window initialized successfully!", BotGUI::MessageTarget::cmdOnly, 1);
 	}
 
 	void Render::GladSetup()
 	{
-		cout << "Initializing GLAD...\n";
+		BotGUI::Print("Initializing GLAD...", BotGUI::MessageTarget::cmdOnly);
 
 		//check if glad is initialized before continuing
 		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 		{
-			cout << "Failed to initialize GLAD!\n\n";
-			return;
+			Bot::CreateErrorPopup("Failed to initialize GLAD!");
 		}
 
-		cout << "GLAD initialized successfully!\n\n";
+		BotGUI::Print("GLAD initialized successfully!", BotGUI::MessageTarget::cmdOnly, 1);
 	}
 
 	void Render::UpdateAfterRescale(GLFWwindow* window, int width, int height)

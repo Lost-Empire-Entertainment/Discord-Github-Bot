@@ -2,10 +2,8 @@
 
 #include <iostream>
 #include <filesystem>
-#include <string>
 
 //external
-#include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_internal.h"
@@ -21,7 +19,6 @@
 #include "configfile.hpp"
 #include "bot.hpp"
 
-using std::string;
 using std::cout;
 
 using Core::Bot;
@@ -127,20 +124,86 @@ namespace Graphics::GUI
 
 		if (ImGui::Begin("##Main", NULL, windowFlags))
 		{
-			RenderWindowContent();
+			ImVec2 threeQuarters = ImVec2(GetScreenWidth() / 4 * 2.25f, GetScreenHeight() - 20.0f);
+			RenderConsole(threeQuarters);
+
+			ImGui::End();
 		}
 	}
 
-	void BotGUI::RenderWindowContent()
+	void BotGUI::RenderConsole(ImVec2 windowSize)
 	{
-		if (ImGui::Button("123"))
+		ImVec2 scrollingRegionSize(
+			windowSize.x,
+			windowSize.y);
+		if (ImGui::BeginChild("ScrollingRegion", scrollingRegionSize, true))
 		{
-			string channelID = BotMechanics::channelID;
-			string message = "i like windows";
-			BotMechanics::SendDiscordMessage(channelID, message);
+			float wrapWidth = windowSize.x - 10;
+			ImGui::PushTextWrapPos(ImGui::GetCursorPos().x + wrapWidth);
+
+			//display the content of the text buffer
+			for (const auto& message : output)
+			{
+				ImGui::TextWrapped("%s", message.c_str());
+
+				if (ImGui::IsItemClicked()
+					&& ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+				{
+					Print("---- Added '" + message + "' to clipboard.", MessageTarget::cmdOnly);
+					ImGui::SetClipboardText(message.c_str());
+				}
+			}
+
+			ImGui::PopTextWrapPos();
+
+			//scrolls to the bottom if scrolling is allowed
+			//and if user is close to the newest compilation message
+			bool isNearBottom = ImGui::GetScrollY() >= ImGui::GetScrollMaxY() - 10.0f;
+			if (isNearBottom
+				|| (!firstScrollToBottom))
+			{
+				ImGui::SetScrollHereY(1.0f);
+				firstScrollToBottom = true;
+			}
 		}
 
-		ImGui::End();
+		ImGui::EndChild();
+	}
+
+	void BotGUI::Print(const string& message, MessageTarget messageTarget, int newLineCount)
+	{
+		//prints to external cmd console
+		if (messageTarget == MessageTarget::both
+			|| messageTarget == MessageTarget::cmdOnly)
+		{
+			cout << message << "\n";
+		}
+
+		//prints to executable gui console
+		if (messageTarget == MessageTarget::both
+			|| messageTarget == MessageTarget::consoleOnly)
+		{
+			output.emplace_back(message);
+		}
+
+		//prints new lines to cmd and console
+		if (newLineCount != 0)
+		{
+			for (int i = 0; i < newLineCount; ++i)
+			{
+				if (messageTarget == MessageTarget::both
+					|| messageTarget == MessageTarget::cmdOnly)
+				{
+					cout << "\n";
+				}
+
+				if (messageTarget == MessageTarget::both
+					|| messageTarget == MessageTarget::consoleOnly)
+				{
+					output.emplace_back("");
+				}
+			}
+		}
 	}
 
 	void BotGUI::Shutdown()

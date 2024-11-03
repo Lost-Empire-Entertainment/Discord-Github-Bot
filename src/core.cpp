@@ -63,11 +63,12 @@ namespace Core
 			CreateErrorPopup((exeName + " is already running!").c_str());
 		}
 
-		cout << "Copyright (C) Lost Empire Entertainment 2024\n\n";
+		BotGUI::Print("Copyright (C) Lost Empire Entertainment 2024");
 
 		string finalExeName = exeName != "" ? exeName : "Bot";
 		string finalVersion = version != "" ? version : "1.0.0";
-		cout << "Initializing " << finalExeName << " " << finalVersion << "...\n";
+
+		BotGUI::Print("Initializing " + finalExeName + " " + finalVersion + "...", BotGUI::MessageTarget::cmdOnly, 1);
 
 		//
 		// SET DOCUMENTS PATH
@@ -109,7 +110,7 @@ namespace Core
 
 			if (!exists(docsPath)) File::CreateNewFolder(docsPath);
 
-			cout << exeName << " documents path: " << docsPath << "\n";
+			BotGUI::Print("documents path: " + docsPath, BotGUI::MessageTarget::cmdOnly);
 
 			filesPath = current_path().generic_string() + "\\files";
 			filesPath = String::CharReplace(filesPath, '/', '\\');
@@ -119,9 +120,11 @@ namespace Core
 				return;
 			}
 
-			cout << "Files path: " << filesPath << "\n";
+			BotGUI::Print("files path: " + filesPath, BotGUI::MessageTarget::cmdOnly);
 
 			configFilePath = docsPath + "\\config.txt";
+
+			BotGUI::Print("config file path: " + configFilePath, BotGUI::MessageTarget::cmdOnly, 1);
 
 			ConfigFile::LoadData();
 		}
@@ -225,7 +228,8 @@ namespace Core
 
 	void Bot::Run()
 	{
-		cout << "Running bot...\n";
+		BotGUI::Print("Reached render loop...", BotGUI::MessageTarget::both);
+		BotGUI::Print("==============================", BotGUI::MessageTarget::both, 1);
 
 		isBotRunning = true;
 
@@ -253,7 +257,8 @@ namespace Core
 
 	void Bot::Shutdown()
 	{
-		cout << "Shutting down bot...\n";
+		BotGUI::Print("Shutting down...", BotGUI::MessageTarget::both);
+		BotGUI::Print("==============================", BotGUI::MessageTarget::both);
 
 		isBotRunning = false;
 

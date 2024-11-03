@@ -8,6 +8,4 @@ int main()
 {
 	Bot::Initialize();
 	Bot::Run();
-
-	return 0;
 }

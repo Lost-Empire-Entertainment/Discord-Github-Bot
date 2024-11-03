@@ -27,6 +27,8 @@ using std::cout;
 using std::wstring;
 using std::filesystem::exists;
 using std::filesystem::current_path;
+using std::quick_exit;
+using std::exit;
 
 using Graphics::Render;
 using Graphics::GUI::BotGUI;
@@ -42,6 +44,16 @@ namespace Core
 		dotenv::init();
 
 		exeName = GetEnv("BOT_EXE_NAME");
+		if (exeName == "")
+		{
+			CreateErrorPopup("Failed to get exe name from env file! Did you forget to create one?");
+		}
+
+		version = GetEnv("BOT_EXE_VERSION");
+		if (version == "")
+		{
+			CreateErrorPopup("Failed to get exe version from env file! Did you forget to add the BOT_EXE_VERSION variable?");
+		}
 
 		if (IsThisProcessAlreadyRunning(exeName + ".exe"))
 		{
@@ -50,7 +62,9 @@ namespace Core
 
 		cout << "Copyright (C) Lost Empire Entertainment 2024\n\n";
 
-		cout << "Initializing Bot...\n";
+		string finalExeName = exeName != "" ? exeName : "Bot";
+		string finalVersion = version != "" ? version : "1.0.0";
+		cout << "Initializing " << finalExeName << " " << finalVersion << "...\n";
 
 		//
 		// SET DOCUMENTS PATH
@@ -186,7 +200,8 @@ namespace Core
 
 	void Bot::CreateErrorPopup(const char* errorMessage)
 	{
-		string title = exeName + " has shut down";
+		string finalExeName = exeName != "" ? exeName : "Bot";
+		string title = finalExeName + " has shut down";
 
 		cout << "\n"
 			<< "===================="
@@ -240,6 +255,8 @@ namespace Core
 			BotGUI::Shutdown();
 
 			glfwTerminate();
+
+			quick_exit(EXIT_SUCCESS);
 		}
 		else
 		{
@@ -260,6 +277,8 @@ namespace Core
 				<< ".\n"
 				<< ".\n"
 				<< ".\n\n";
+
+			exit(EXIT_SUCCESS);
 		}
 	}
 }

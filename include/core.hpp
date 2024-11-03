@@ -12,6 +12,7 @@ namespace Core
 	{
 	public:
 		static inline string exeName;
+		static inline string version;
 
 		static inline string filesPath;
 		static inline string docsPath;

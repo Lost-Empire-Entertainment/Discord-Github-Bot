@@ -33,6 +33,9 @@ set(EXT_STB_IMAGE_DIR "${CMAKE_SOURCE_DIR}/_external_shared/Stb_image")
 set(EXT_CURL_DIR "${CMAKE_SOURCE_DIR}/_external_shared/libcurl")
 set(EXT_DPP_DIR "${CMAKE_SOURCE_DIR}/_external_shared/dpp")
 set(EXT_DOTENV_DIR "${CMAKE_SOURCE_DIR}/_external_shared/dotenv-cpp")
+set(EXT_ZLIB_DIR "${CMAKE_SOURCE_DIR}/_external_shared/ZLib")
+set(EXT_OPENSSL_DIR "${CMAKE_SOURCE_DIR}/_external_shared/OpenSSL")
+set(EXT_OPUS_DIR "${CMAKE_SOURCE_DIR}/_external_shared/Opus")
 
 # Add GLAD
 add_library(glad STATIC ${EXT_GLAD_DIR}/glad.c)
@@ -109,16 +112,11 @@ target_compile_definitions(Discord_Github_Bot PRIVATE GLFW_INCLUDE_NONE)
 set(CMAKE_INSTALL_BINDIR bin)
 install(TARGETS Discord_Github_Bot DESTINATION ${CMAKE_INSTALL_BINDIR})
 
-# Copy "data.env" to install directory after build
-add_custom_command(TARGET Discord_Github_Bot POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E remove
-    $<TARGET_FILE_DIR:Discord_Github_Bot>/data.env
-	COMMAND ${CMAKE_COMMAND} -E copy
-    ${CMAKE_SOURCE_DIR}/data.env
-    $<TARGET_FILE_DIR:Discord_Github_Bot>/data.env
-)
+#
+# DLL FILES START
+#
 
-# Copy libcurl.dll to the output directory after build (Windows specific)
+# Copy libcurl.dll to the output directory after build
 add_custom_command(TARGET Discord_Github_Bot POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E remove
     $<TARGET_FILE_DIR:Discord_Github_Bot>/libcurl.dll
@@ -127,13 +125,62 @@ add_custom_command(TARGET Discord_Github_Bot POST_BUILD
     $<TARGET_FILE_DIR:Discord_Github_Bot>/libcurl.dll
 )
 
-# Copy dpp.dll to the output directory after build (Windows specific)
+# Copy dpp.dll to the output directory after build
 add_custom_command(TARGET Discord_Github_Bot POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E remove
     $<TARGET_FILE_DIR:Discord_Github_Bot>/dpp.dll
 	COMMAND ${CMAKE_COMMAND} -E copy
     ${EXT_DPP_DIR}/dpp.dll
     $<TARGET_FILE_DIR:Discord_Github_Bot>/dpp.dll
+)
+
+# Copy zlib1.dll to the output directory after build
+add_custom_command(TARGET Discord_Github_Bot POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E remove
+    $<TARGET_FILE_DIR:Discord_Github_Bot>/zlib1.dll
+	COMMAND ${CMAKE_COMMAND} -E copy
+    ${EXT_ZLIB_DIR}/zlib1.dll
+    $<TARGET_FILE_DIR:Discord_Github_Bot>/zlib1.dll
+)
+
+# Copy libssl-1_1-x64.dll to the output directory after build
+add_custom_command(TARGET Discord_Github_Bot POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E remove
+    $<TARGET_FILE_DIR:Discord_Github_Bot>/libssl-1_1-x64.dll
+	COMMAND ${CMAKE_COMMAND} -E copy
+    ${EXT_OPENSSL_DIR}/libssl-1_1-x64.dll
+    $<TARGET_FILE_DIR:Discord_Github_Bot>/libssl-1_1-x64.dll
+)
+
+# Copy libcrypto-1_1-x64.dll to the output directory after build
+add_custom_command(TARGET Discord_Github_Bot POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E remove
+    $<TARGET_FILE_DIR:Discord_Github_Bot>/libcrypto-1_1-x64.dll
+	COMMAND ${CMAKE_COMMAND} -E copy
+    ${EXT_OPENSSL_DIR}/libcrypto-1_1-x64.dll
+    $<TARGET_FILE_DIR:Discord_Github_Bot>/libcrypto-1_1-x64.dll
+)
+
+# Copy opus.dll to the output directory after build
+add_custom_command(TARGET Discord_Github_Bot POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E remove
+    $<TARGET_FILE_DIR:Discord_Github_Bot>/opus.dll
+	COMMAND ${CMAKE_COMMAND} -E copy
+    ${EXT_OPUS_DIR}/opus.dll
+    $<TARGET_FILE_DIR:Discord_Github_Bot>/opus.dll
+)
+
+#
+# DLL FILES END
+#
+
+# Copy "data.env" to install directory after build
+add_custom_command(TARGET Discord_Github_Bot POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E remove
+    $<TARGET_FILE_DIR:Discord_Github_Bot>/data.env
+	COMMAND ${CMAKE_COMMAND} -E copy
+    ${CMAKE_SOURCE_DIR}/data.env
+    $<TARGET_FILE_DIR:Discord_Github_Bot>/data.env
 )
 
 # Copy "files" directory to the install directory after build

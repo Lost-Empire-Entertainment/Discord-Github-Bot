@@ -1,0 +1,5 @@
+Original repository link:
+https://github.com/madler/zlib
+
+Changes:
+- zlib1 DLL file is downloaded from https://github.com/brainboxdotcc/windows-bot-template at MyBot/dependencies/64/Release/bin

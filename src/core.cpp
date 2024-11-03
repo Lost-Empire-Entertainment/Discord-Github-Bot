@@ -1,5 +1,8 @@
 //Copyright(C) 2024 Lost Empire Entertainment
 
+//used for dotenv.h, safe functions are still used in Bot::GetEnv function
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <cstdlib>
 #include <Windows.h>
 #include <TlHelp32.h>
@@ -15,8 +18,11 @@
 #include "core.hpp"
 #include "render.hpp"
 #include "gui.hpp"
+#include "console.hpp"
+#include "fileutils.hpp"
+#include "stringutils.hpp"
+#include "configfile.hpp"
 
-using std::getenv;
 using std::cout;
 using std::wstring;
 using std::filesystem::exists;
@@ -24,6 +30,9 @@ using std::filesystem::current_path;
 
 using Graphics::Render;
 using Graphics::GUI::BotGUI;
+using Graphics::GUI::Console;
+using Utils::String;
+using Utils::File;
 
 namespace Core
 {
@@ -32,7 +41,7 @@ namespace Core
 		//initialize dotenv
 		dotenv::init();
 
-		exeName = getenv("BOT_EXE_NAME");
+		exeName = GetEnv("BOT_EXE_NAME");
 
 		if (IsThisProcessAlreadyRunning(exeName + ".exe"))
 		{
@@ -105,6 +114,32 @@ namespace Core
 		}
 
 		Render::RenderInitialize();
+	}
+
+	string Bot::GetEnv(const string& envVariable)
+	{
+		char* envValue{};
+		size_t size{};
+
+		if (_dupenv_s(&envValue, &size, envVariable.c_str()) == 0) 
+		{
+			if (envValue) 
+			{
+				string result(envValue);
+				free(envValue);
+				return result;
+			}
+			else 
+			{
+				cout << "Environment variable not found." << std::endl;
+				return "";
+			}
+		}
+		else 
+		{
+			cout << "Error retrieving environment variable." << std::endl;
+			return "";
+		}
 	}
 
 	bool Bot::IsThisProcessAlreadyRunning(const string& processName)
@@ -186,13 +221,21 @@ namespace Core
 		}
 	}
 
+	//counts as idle if minimized
+	bool Bot::IsUserIdle()
+	{
+		int width, height;
+		glfwGetWindowSize(Render::window, &width, &height);
+		if (width == 0 || height == 0) return true;
+
+		return false;
+	}
+
 	void Bot::Shutdown(bool immediate)
 	{
 		if (immediate)
 		{
 			isBotRunning = false;
-
-			ConsoleManager::CloseLogger();
 
 			BotGUI::Shutdown();
 
@@ -202,28 +245,12 @@ namespace Core
 		{
 			isBotRunning = false;
 
-			ConfigFile::SaveConfigFile();
-
-			ConsoleManager::WriteConsoleMessage(
-				Caller::INPUT,
-				Type::INFO,
-				"==================================================\n\n",
-				true);
-
-			ConsoleManager::WriteConsoleMessage(
-				Caller::SHUTDOWN,
-				Type::INFO,
-				"Cleaning up resources...\n");
+			ConfigFile::SaveData();
 
 			BotGUI::Shutdown();
 
 			//clean all glfw resources after program is closed
 			glfwTerminate();
-
-			ConsoleManager::WriteConsoleMessage(
-				Caller::SHUTDOWN,
-				Type::INFO,
-				"Shutdown complete!\n");
 
 			cout << "\n==================================================\n"
 				<< "\n"
@@ -233,8 +260,6 @@ namespace Core
 				<< ".\n"
 				<< ".\n"
 				<< ".\n\n";
-
-			ConsoleManager::CloseLogger();
 		}
 	}
 }

@@ -78,11 +78,6 @@ namespace Graphics
 
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
-		glfwSetKeyCallback(window, Input::KeyCallback);
-		glfwSetMouseButtonCallback(window, Input::MouseButtonCallback);
-		glfwSetScrollCallback(window, Input::ScrollCallback);
-		glfwSetCursorPosCallback(window, Input::MouseMovementCallback);
-
 		glfwSetWindowCloseCallback(window, [](GLFWwindow* window) { Bot::Shutdown(); });
 
 		cout << "Window initialized successfully!\n\n";

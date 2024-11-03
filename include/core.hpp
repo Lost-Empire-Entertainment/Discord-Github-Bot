@@ -19,11 +19,15 @@ namespace Core
 
 		static inline bool isBotRunning;
 
+		static string GetEnv(const string& envVariable);
+
 		static void Initialize();
 		static void Run();
 
 		static void CreateErrorPopup(const char* errorMessage = "MISSING ERROR MESSAGE");
 		static bool IsThisProcessAlreadyRunning(const string& processName);
+
+		static bool IsUserIdle();
 
 		static void Shutdown(bool immediate = false);
 	};

@@ -14,7 +14,10 @@ namespace Core
 		static inline string channelID;
 
 		static void Initialize();
+		static void BotMessageEvents();
+
 		static void SendDiscordMessage(const string& channelID, const string& message);
+
 		static void Shutdown();
 	};
 }

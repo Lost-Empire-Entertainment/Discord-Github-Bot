@@ -26,6 +26,7 @@ namespace Graphics::GUI
 
 		static void RenderParentWindow();
 		static void RenderConsole(ImVec2 windowSize);
+		static void RenderRightSideInteractions(ImVec2 windowSize);
 
 		enum class MessageTarget
 		{

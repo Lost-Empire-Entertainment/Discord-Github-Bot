@@ -124,8 +124,13 @@ namespace Graphics::GUI
 
 		if (ImGui::Begin("##Main", NULL, windowFlags))
 		{
-			ImVec2 threeQuarters = ImVec2(GetScreenWidth() / 4 * 2.25f, GetScreenHeight() - 20.0f);
-			RenderConsole(threeQuarters);
+			ImVec2 leftChildSize = ImVec2(width * 0.55f, height - 20.0f);
+			RenderConsole(leftChildSize);
+
+			ImGui::SameLine();
+
+			ImVec2 rightChildSize = ImVec2(width * 0.45f - 25.0f, height - 20.0f);
+			RenderRightSideInteractions(rightChildSize);
 
 			ImGui::End();
 		}
@@ -136,7 +141,7 @@ namespace Graphics::GUI
 		ImVec2 scrollingRegionSize(
 			windowSize.x,
 			windowSize.y);
-		if (ImGui::BeginChild("ScrollingRegion", scrollingRegionSize, true))
+		if (ImGui::BeginChild("left", scrollingRegionSize, true))
 		{
 			float wrapWidth = windowSize.x - 10;
 			ImGui::PushTextWrapPos(ImGui::GetCursorPos().x + wrapWidth);
@@ -164,6 +169,23 @@ namespace Graphics::GUI
 			{
 				ImGui::SetScrollHereY(1.0f);
 				firstScrollToBottom = true;
+			}
+		}
+
+		ImGui::EndChild();
+	}
+
+	void BotGUI::RenderRightSideInteractions(ImVec2 windowSize)
+	{
+		ImVec2 scrollingRegionSize(
+			windowSize.x,
+			windowSize.y);
+		if (ImGui::BeginChild("right", scrollingRegionSize, true))
+		{
+			if (ImGui::Button("linux sux"))
+			{
+				string channelID = "1264625286054412350";
+				BotMechanics::SendDiscordMessage(channelID, "linux sux");
 			}
 		}
 

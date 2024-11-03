@@ -24,6 +24,7 @@ using Graphics::GUI::BotGUI;
 namespace Core
 {
 	unique_ptr<dpp::cluster> bot;
+    dpp::loglevel current_log_level = dpp::ll_trace;
 	thread botThread;
 
 	void BotMechanics::Initialize()
@@ -42,71 +43,169 @@ namespace Core
 
 		bot = make_unique<dpp::cluster>(botToken);
 
+        BotMessageEvents();
+
+		//event handler for when the bot is ready
+		bot->on_ready([&](const dpp::ready_t& event)
+		{
+			BotGUI::Print("Bot is ready and connected!");
+		});
+
+		//run the bot in a separate thread in non-blocking mode
+		botThread = thread([]() 
+		{
+			bot->start(false);
+		});
+	}
+
+	void BotMechanics::BotMessageEvents()
+	{
+        //
+        // DPP NATIVE EVENTS
+        //
+
+        bot->on_guild_create([](const dpp::guild_create_t& event)
+            {
+                string cleanedMessage = "[GUILD] Guild data received. Bot has joined or connected to a guild.";
+                BotGUI::Print(cleanedMessage);
+            });
+
+        bot->on_guild_delete([](const dpp::guild_delete_t& event)
+            {
+                string cleanedMessage = "[GUILD] Bot was removed from a guild or the guild was deleted.";
+                BotGUI::Print(cleanedMessage);
+            });
+
+        bot->on_guild_update([](const dpp::guild_update_t& event)
+            {
+                string cleanedMessage = "[GUILD] Guild information updated.";
+                BotGUI::Print(cleanedMessage);
+            });
+
+        bot->on_channel_create([](const dpp::channel_create_t& event)
+            {
+                string cleanedMessage = "[CHANNEL] New channel created in guild.";
+                BotGUI::Print(cleanedMessage);
+            });
+
+        bot->on_channel_delete([](const dpp::channel_delete_t& event)
+            {
+                string cleanedMessage = "[CHANNEL] Channel deleted in guild.";
+                BotGUI::Print(cleanedMessage);
+            });
+
+        bot->on_voice_server_update([](const dpp::voice_server_update_t& event)
+            {
+                string cleanedMessage = "[CHANNEL] Voice server updated in guild.";
+                BotGUI::Print(cleanedMessage);
+            });
+
+        bot->on_voice_state_update([](const dpp::voice_state_update_t& event)
+            {
+                string cleanedMessage = "[CHANNEL] Voice state updated for a user in voice channel.";
+                BotGUI::Print(cleanedMessage);
+            });
+
+        bot->on_message_create([](const dpp::message_create_t& event)
+            {
+                string cleanedMessage = "[EVENT] New message created in a channel.";
+                BotGUI::Print(cleanedMessage);
+            });
+
+        bot->on_message_update([](const dpp::message_update_t& event)
+            {
+                string cleanedMessage = "[EVENT] Message edited in a channel.";
+                BotGUI::Print(cleanedMessage);
+            });
+
+        bot->on_message_delete([](const dpp::message_delete_t& event)
+            {
+                string cleanedMessage = "[EVENT] Message deleted in a channel.";
+                BotGUI::Print(cleanedMessage);
+            });
+
+        bot->on_message_reaction_add([](const dpp::message_reaction_add_t& event)
+            {
+                string cleanedMessage = "[EVENT] Reaction added to a message.";
+                BotGUI::Print(cleanedMessage);
+            });
+
+        bot->on_message_reaction_remove([](const dpp::message_reaction_remove_t& event)
+            {
+                string cleanedMessage = "[EVENT] Reaction removed from a message.";
+                BotGUI::Print(cleanedMessage);
+            });
+
+        bot->on_typing_start([](const dpp::typing_start_t& event)
+            {
+                string cleanedMessage = "[EVENT] User started typing in a channel.";
+                BotGUI::Print(cleanedMessage);
+            });
+
+
+        //
+        // DPP AND DISCORD OPCODES AND SESSION MESSAGES
+        //
+
         bot->on_log([](const dpp::log_t& log)
             {
-                string op0 = "\"op\":0";
-                string op1 = "\"op\":1";
-                string op2 = "\"op\":2";
-                string op3 = "\"op\":3";
-                string op4 = "\"op\":4";
-                string op6 = "\"op\":6";
-                string op7 = "\"op\":7";
-                string op8 = "\"op\":8";
-                string op9 = "\"op\":9";
-                string op10 = "\"op\":10";
-                string op11 = "\"op\":11";
-
                 string cleanedMessage;
 
                 //opcodes
-                if (log.message.find(op0) != string::npos)
+                if (log.message.find("\"op\":0") != string::npos)
                 {
-                    cleanedMessage = "[DISPATCH][OPCODE: 0] Dispatch event: Receiving an event from Discord (e.g., message creation, guild update).";
+                    cleanedMessage = "[DISPATCH][OPCODE: 0] Dispatch event: Receiving an event from Discord.";
                 }
-                else if (log.message.find(op1) != string::npos)
+                else if (log.message.find("\"op\":1") != string::npos)
                 {
                     cleanedMessage = "[HEARTBEAT][OPCODE: 1] Heartbeat sent: Keeping connection alive with Discord.";
                 }
-                else if (log.message.find(op2) != string::npos)
+                else if (log.message.find("\"op\":2") != string::npos)
                 {
-                    cleanedMessage = "[IDENTIFY][OPCODE: 2] Identify event: Sending bot properties to authenticate and start a new session.";
+                    cleanedMessage = "[IDENTIFY][OPCODE: 2] Identify event: Sending bot properties to authenticate.";
                 }
-                else if (log.message.find(op3) != string::npos)
+                else if (log.message.find("\"op\":3") != string::npos)
                 {
                     if (log.message.find("online") != string::npos)
+                    {
                         cleanedMessage = "[PRESENCE_UPDATE][OPCODE: 3] Presence update: Bot is now online.";
+                    }
                     else if (log.message.find("idle") != string::npos)
+                    {
                         cleanedMessage = "[PRESENCE_UPDATE][OPCODE: 3] Presence update: Bot is now idle.";
+                    }
                     else
+                    {
                         cleanedMessage = "[PRESENCE_UPDATE][OPCODE: 3] Presence update: Bot's presence has changed.";
+                    }
                 }
-                else if (log.message.find(op4) != string::npos)
+                else if (log.message.find("\"op\":4") != string::npos)
                 {
                     cleanedMessage = "[VOICE_STATE_UPDATE][OPCODE: 4] Voice state update: Joining, leaving, or moving voice channels.";
                 }
-                else if (log.message.find(op6) != string::npos)
+                else if (log.message.find("\"op\":6") != string::npos)
                 {
-                    cleanedMessage = "[RESUME][OPCODE: 6] Resume event: Attempting to resume a previous session after disconnection.";
+                    cleanedMessage = "[RESUME][OPCODE: 6] Resume event: Attempting to resume a previous session.";
                 }
-                else if (log.message.find(op7) != string::npos)
+                else if (log.message.find("\"op\":7") != string::npos)
                 {
                     cleanedMessage = "[RECONNECT][OPCODE: 7] Reconnect requested: Discord is requesting the bot to reconnect.";
                 }
-                else if (log.message.find(op8) != string::npos)
+                else if (log.message.find("\"op\":8") != string::npos)
                 {
-                    cleanedMessage = "[REQUEST_GUILD_MEMBERS][OPCODE: 8] Request guild members: Requesting information about guild members (e.g., offline users).";
+                    cleanedMessage = "[REQUEST_GUILD_MEMBERS][OPCODE: 8] Request guild members.";
                 }
-                else if (log.message.find(op9) != string::npos)
+                else if (log.message.find("\"op\":9") != string::npos)
                 {
-                    cleanedMessage = "[INVALID_SESSION][OPCODE: 9] Invalid session: The session is invalid. Bot needs to reauthenticate or start a new session.";
+                    cleanedMessage = "[INVALID_SESSION][OPCODE: 9] Invalid session: The session is invalid.";
                 }
-                else if (log.message.find(op10) != string::npos)
+                else if (log.message.find("\"op\":10") != string::npos)
                 {
-                    cleanedMessage = "[HELLO][OPCODE: 10] Hello event: Connection established. Discord is sending the heartbeat interval.";
+                    cleanedMessage = "[HELLO][OPCODE: 10] Hello event: Connection established. Sending heartbeat interval.";
                 }
-                else if (log.message.find(op11) != string::npos)
+                else if (log.message.find("\"op\":11") != string::npos)
                 {
-                    cleanedMessage = "[HEARTBEAT_ACK][OPCODE: 11] Heartbeat acknowledged: Discord has received the bot's heartbeat, connection is active.";
+                    cleanedMessage = "[HEARTBEAT_ACK][OPCODE: 11] Heartbeat acknowledged: Connection is active.";
                 }
                 else if (log.message.find("\"op\":") != string::npos)
                 {
@@ -135,106 +234,17 @@ namespace Core
                     cleanedMessage = "[SESSION] Session limit reached. Please wait before attempting to reconnect.";
                 }
 
-                //guild and channel events
-                else if (cleanedMessage.empty() && log.message.find("GUILD_CREATE") != string::npos)
-                {
-                    cleanedMessage = "[GUILD] Guild data received. Bot has joined or connected to a guild.";
-                }
-                else if (cleanedMessage.empty() && log.message.find("GUILD_DELETE") != string::npos)
-                {
-                    cleanedMessage = "[GUILD] Bot was removed from a guild or the guild was deleted.";
-                }
-                else if (cleanedMessage.empty() && log.message.find("GUILD_UPDATE") != string::npos)
-                {
-                    cleanedMessage = "[GUILD] Guild information updated.";
-                }
-                else if (cleanedMessage.empty() && log.message.find("CHANNEL_CREATE") != string::npos)
-                {
-                    cleanedMessage = "[CHANNEL] New channel created in guild.";
-                }
-                else if (cleanedMessage.empty() && log.message.find("CHANNEL_DELETE") != string::npos)
-                {
-                    cleanedMessage = "[CHANNEL] Channel deleted in guild.";
-                }
-                else if (cleanedMessage.empty() && log.message.find("VOICE_SERVER_UPDATE") != string::npos)
-                {
-                    cleanedMessage = "[CHANNEL] Voice server updated in guild.";
-                }
-                else if (cleanedMessage.empty() && log.message.find("VOICE_STATE_UPDATE") != string::npos)
-                {
-                    cleanedMessage = "[CHANNEL] Voice state updated for a user in voice channel.";
-                }
-
-                //rate limiting and errors
-                else if (cleanedMessage.empty() && log.message.find("429") != string::npos)
-                {
-                    cleanedMessage = "[RATE_LIMIT] Rate limit warning! Requests are being throttled by Discord.";
-                }
-                else if (cleanedMessage.empty() && log.message.find("error") != string::npos)
-                {
-                    cleanedMessage = "[ERROR] Error detected: " + log.message;
-                }
-
-                //miscellaneous events
-                else if (cleanedMessage.empty() && log.message.find("TYPING_START") != string::npos)
-                {
-                    cleanedMessage = "[EVENT] User started typing in a channel.";
-                }
-                else if (cleanedMessage.empty() && log.message.find("MESSAGE_CREATE") != string::npos)
-                {
-                    cleanedMessage = "[EVENT] New message created in a channel.";
-                }
-                else if (cleanedMessage.empty() && log.message.find("MESSAGE_UPDATE") != string::npos)
-                {
-                    cleanedMessage = "[EVENT] Message edited in a channel.";
-                }
-                else if (cleanedMessage.empty() && log.message.find("MESSAGE_DELETE") != string::npos)
-                {
-                    cleanedMessage = "[EVENT] Message deleted in a channel.";
-                }
-                else if (cleanedMessage.empty() && log.message.find("MESSAGE_REACTION_ADD") != string::npos)
-                {
-                    cleanedMessage = "[EVENT] Reaction added to a message.";
-                }
-                else if (cleanedMessage.empty() && log.message.find("MESSAGE_REACTION_REMOVE") != string::npos)
-                {
-                    cleanedMessage = "[EVENT] Reaction removed from a message.";
-                }
-
-                if (cleanedMessage.empty())
-                {
-                    //vor other messages, trim JSON-like characters
-                    cleanedMessage = log.message;
-                    cleanedMessage.erase(remove_if(cleanedMessage.begin(), cleanedMessage.end(), [](char c)
-                        {
-                            return c == '{'
-                                || c == '}'
-                                || c == '\\'
-                                || c == '['
-                                || c == ']';
-                        }), cleanedMessage.end());
-                }
-
-                BotGUI::Print(cleanedMessage);
+                //print the final cleaned message
+                if (!cleanedMessage.empty()) BotGUI::Print(cleanedMessage);
             });
-
-		//event handler for when the bot is ready
-		bot->on_ready([&](const dpp::ready_t& event)
-		{
-			BotGUI::Print("Bot is ready and connected!");
-		});
-
-		//run the bot in a separate thread in non-blocking mode
-		botThread = thread([]() 
-		{
-			bot->start(false);
-		});
 	}
 
 	void BotMechanics::SendDiscordMessage(const string& channelID, const string& message)
 	{
 		dpp::snowflake convertedChannelID = static_cast<dpp::snowflake>(stoull(channelID));
 		bot->message_create(dpp::message(convertedChannelID, message));
+
+        BotGUI::Print("[BOT MESSAGE] Message '" + message + "' was sent to channel '" + channelID + "'.");
 	}
 
 	void BotMechanics::Shutdown()

@@ -52,7 +52,17 @@ namespace Core
             Bot::CreateErrorPopup("Failed to get discord bot id from env file! Did you forget to add the DISCORD_BOT_ID variable?");
         }
 
-		bot = make_unique<dpp::cluster>(botToken);
+        //set up intents to include guilds, channels, members, and emojis
+        uint32_t intents =
+            dpp::i_default_intents
+            | dpp::i_guild_members       //for guild member events
+            | dpp::i_guilds              //for guild events
+            | dpp::i_guild_emojis        //for emoji events
+            | dpp::i_message_content     //for accessing message content
+            | dpp::i_guild_voice_states  //for voice state events
+            | dpp::i_guild_bans;         //for guild ban events
+
+        bot = make_unique<dpp::cluster>(botToken, intents);
 
         BotMessageEvents();
 
@@ -78,256 +88,396 @@ namespace Core
         //bot joined server
         bot->on_guild_create([](const dpp::guild_create_t& event)
             {
-                string guildName = GetGuildName(to_string(event.created->id));
-                string cleanedMessage = "[GUILD] Bot has joined the guild: " + guildName;
-                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                GetGuildName(to_string(event.created->id), [event](const string& guildName)
+                    {
+                        string cleanedMessage = "[GUILD] Bot has joined the guild: " + guildName;
+                        BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                    });
             });
 
         //bot left server
         bot->on_guild_delete([](const dpp::guild_delete_t& event)
             {
-                string guildName = GetGuildName(to_string(event.guild_id));
-                string cleanedMessage = "[GUILD] Bot was removed from the guild: " + guildName;
-                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                GetGuildName(to_string(event.guild_id), [event](const string& guildName)
+                    {
+                        string cleanedMessage = "[GUILD] Bot was removed from the guild: " + guildName;
+                        BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                    });
             });
 
         //server was updated
         bot->on_guild_update([](const dpp::guild_update_t& event)
             {
-                string guildName = GetGuildName(to_string(event.updated->id));
-                string cleanedMessage = "[GUILD] Guild information updated for: " + guildName;
-                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                GetGuildName(to_string(event.updated->id), [event](const string& guildName)
+                    {
+                        string cleanedMessage = "[GUILD] Guild information updated for: " + guildName;
+                        BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                    });
             });
 
         //channel was created in server
         bot->on_channel_create([](const dpp::channel_create_t& event)
             {
-                string channelName = GetChannelName(to_string(event.created->id));
-                string cleanedMessage = "[CHANNEL] New channel created: " + channelName;
-                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                GetChannelName(to_string(event.created->id), [event](const string& channelName)
+                    {
+                        string cleanedMessage = "[CHANNEL] New channel created: " + channelName;
+                        BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                    });
             });
 
         //channel was deleted in server
         bot->on_channel_delete([](const dpp::channel_delete_t& event)
             {
-                string channelName = GetChannelName(to_string(event.deleted.id));
-                string cleanedMessage = "[CHANNEL] Channel deleted: " + channelName;
-                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                GetChannelName(to_string(event.deleted.id), [event](const string& channelName)
+                    {
+                        string cleanedMessage = "[CHANNEL] Channel deleted: " + channelName;
+                        BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                    });
             });
 
         //a voice channel was updated in server
         bot->on_voice_server_update([](const dpp::voice_server_update_t& event)
             {
-                string cleanedMessage = "[CHANNEL] Voice server updated in guild: " + event.guild_id;
-                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                GetGuildName(to_string(event.guild_id), [event](const string& guildName)
+                    {
+                        string cleanedMessage = "[CHANNEL] Voice server updated in guild: " + guildName;
+                        BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                    });
             });
 
-        //a users voice state was updated
+        //a user's voice state was updated
         bot->on_voice_state_update([](const dpp::voice_state_update_t& event)
             {
-                string channelName = GetChannelName(to_string(event.state.channel_id));
-                string username = GetUsername(to_string(event.state.user_id));
-                string updateDetails;
+                GetUsername(to_string(event.state.user_id), [event](const string& username)
+                    {
+                        GetChannelName(to_string(event.state.channel_id), [event, username](const string& channelName)
+                            {
+                                string updateDetails;
 
-                //user is self-mute or not
-                if (event.state.is_self_mute())
-                {
-                    updateDetails = username + " has self-muted.";
-                }
-                else
-                {
-                    updateDetails = username + " has self-unmuted.";
-                }
+                                //user is self-mute or not
+                                if (event.state.is_self_mute())
+                                {
+                                    updateDetails = username + " has self-muted.";
+                                }
+                                else
+                                {
+                                    updateDetails = username + " has self-unmuted.";
+                                }
 
-                //user is self-deaf or not
-                if (event.state.is_self_deaf())
-                {
-                    updateDetails += " " + username + " has self-deafened.";
-                }
-                else
-                {
-                    updateDetails += " " + username + " has self-undeafened.";
-                }
+                                //user is self-deaf or not
+                                if (event.state.is_self_deaf())
+                                {
+                                    updateDetails += " " + username + " has self-deafened.";
+                                }
+                                else
+                                {
+                                    updateDetails += " " + username + " has self-undeafened.";
+                                }
 
-                //user is server-mute or not
-                if (event.state.is_mute())
-                {
-                    updateDetails += " " + username + " is muted by the server.";
-                }
-                else
-                {
-                    updateDetails += " " + username + " is not server-muted.";
-                }
+                                //user is server-mute or not
+                                if (event.state.is_mute())
+                                {
+                                    updateDetails += " " + username + " is muted by the server.";
+                                }
+                                else
+                                {
+                                    updateDetails += " " + username + " is not server-muted.";
+                                }
 
-                //user is server-deaf or not
-                if (event.state.is_deaf())
-                {
-                    updateDetails += " " + username + " is deafened by the server.";
-                }
-                else
-                {
-                    updateDetails += " " + username + " is not server-deafened.";
-                }
+                                //user is server-deaf or not
+                                if (event.state.is_deaf())
+                                {
+                                    updateDetails += " " + username + " is deafened by the server.";
+                                }
+                                else
+                                {
+                                    updateDetails += " " + username + " is not server-deafened.";
+                                }
 
-                //user joined or left
-                if (event.state.channel_id == 0)
-                {
-                    updateDetails += " " + username + " has left the voice channel.";
-                }
-                else
-                {
-                    updateDetails += " " + username + " is in the channel: " + channelName;
-                }
+                                //user joined or left
+                                if (event.state.channel_id == 0)
+                                {
+                                    updateDetails += " " + username + " has left the voice channel.";
+                                }
+                                else
+                                {
+                                    updateDetails += " " + username + " is in the channel: " + channelName;
+                                }
 
-                //user is showing or not showing video
-                if (event.state.self_video())
-                {
-                    updateDetails += " Video is enabled.";
-                }
-                else
-                {
-                    updateDetails += " Video is disabled.";
-                }
+                                //user is showing or not showing video
+                                if (event.state.self_video())
+                                {
+                                    updateDetails += " Video is enabled.";
+                                }
+                                else
+                                {
+                                    updateDetails += " Video is disabled.";
+                                }
 
-                string cleanedMessage = "[CHANNEL] Voice state updated for user " + username + ". " + updateDetails;
-                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                                string cleanedMessage = "[CHANNEL] Voice state updated for user " + username + ". " + updateDetails;
+                                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                            });
+                    });
             });
 
         //a user or bot wrote a message
         bot->on_message_create([](const dpp::message_create_t& event)
             {
-                if (event.msg.author.id == stoull(botID)) return;
+                if (event.msg.author.id == stoull(botID)          //ignore this bot's messages
+                    || event.msg.author.id == 235148962103951360  //ignore Carl-bot messages
+                    || event.msg.author.id == 691713521007984681  //ignore Engauge bot messages
+                    || event.msg.author.id == 620126394390675466) //ignore Taco bot messages
+                {
+                    return;
+                }
 
-                string channelName = GetChannelName(to_string(event.msg.channel_id));
-                string username = GetUsername(to_string(event.msg.author.id));
+                //extract necessary data
+                string messageID = to_string(event.msg.id);
                 string messageContent = event.msg.content;
-                string cleanedMessage = "[EVENT] New message created in channel " + channelName + " by " + username + ": " + messageContent;
-                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                string channelID = to_string(event.msg.channel_id);
+                string authorID = to_string(event.msg.author.id);
+
+                //store the message ID, content and order
+                messageCache[messageID] = messageContent;
+                messageOrder.push_back(messageID);
+
+                const size_t MAX_CACHE_SIZE = 10000;
+                if (messageCache.size() > MAX_CACHE_SIZE)
+                {
+                    const string& oldestMessageID = messageOrder.front();
+                    messageCache.erase(oldestMessageID);
+                    messageOrder.pop_front();
+                }
+
+                GetChannelName(channelID, [authorID, messageContent](const string& channelName)
+                    {
+                        GetUsername(authorID, [channelName, messageContent](const string& username)
+                            {
+                                string cleanedMessage = "[EVENT] New message created in channel " + channelName + " by " + username +
+                                    "\nContent: " + messageContent;
+                                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                            });
+                    });
             });
 
         //a user or bot updated a message
         bot->on_message_update([](const dpp::message_update_t& event)
             {
-                string channelName = GetChannelName(to_string(event.msg.channel_id));
-                string username = GetUsername(to_string(event.msg.author.id));
-                string messageContent = event.msg.content;
-                string cleanedMessage = "[EVENT] Message edited in channel " + channelName + " by " + username + ": " + messageContent;
-                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                string messageID = to_string(event.msg.id);
+                string newMessageContent = event.msg.content;
+                string channelID = to_string(event.msg.channel_id);
+                string authorID = to_string(event.msg.author.id);
+
+                //retrieve the old message content from the cache
+                string oldMessageContent = "Unknown (not cached)";
+                auto it = messageCache.find(messageID);
+                if (it != messageCache.end())
+                {
+                    oldMessageContent = it->second;
+                    //update the cache with the new message content
+                    it->second = newMessageContent;
+                }
+                else
+                {
+                    //if not in cache, store the new message content
+                    messageCache[messageID] = newMessageContent;
+                    messageOrder.push_back(messageID);
+                    //manage cache size as before
+                    const size_t MAX_CACHE_SIZE = 10000; // Adjust as needed
+                    if (messageOrder.size() > MAX_CACHE_SIZE)
+                    {
+                        const string& oldestMessageID = messageOrder.front();
+                        messageCache.erase(oldestMessageID);
+                        messageOrder.pop_front();
+                    }
+                }
+
+                GetChannelName(channelID, [authorID, oldMessageContent, newMessageContent](const string& channelName)
+                    {
+                        GetUsername(authorID, [channelName, oldMessageContent, newMessageContent](const string& username)
+                            {
+                                string cleanedMessage = "[EVENT] Message edited in channel " + channelName + " by " + username +
+                                    "\nOld content: " + oldMessageContent +
+                                    "\nNew content: " + newMessageContent;
+                                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                            });
+                    });
             });
 
         //a user or bot deleted a message
         bot->on_message_delete([](const dpp::message_delete_t& event)
             {
-                if (event.channel_id == stoull(logChannelID)) return;
+                if (event.channel_id == stoull(logChannelID))
+                {
+                    return;
+                }
 
-                string channelName = GetChannelName(to_string(event.channel_id));
-                string cleanedMessage = "[EVENT] Message deleted in channel " + channelName;
-                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                string messageID = to_string(event.id);
+                string channelID = to_string(event.channel_id);
+
+                //retrieve the message content from the cache
+                string messageContent = "Unknown (not cached)";
+                //remove from cache and order
+                auto it = messageCache.find(messageID);
+                if (it != messageCache.end())
+                {
+                    messageContent = it->second;
+                    messageCache.erase(it);
+                    messageOrder.remove(messageID);
+                }
+
+                GetChannelName(channelID, [messageContent](const string& channelName)
+                    {
+                        string cleanedMessage = "[EVENT] Message deleted in channel " + channelName +
+                            "\nContent: " + messageContent;
+                        BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                    });
             });
 
         //a user or bot added a reaction to a message
         bot->on_message_reaction_add([](const dpp::message_reaction_add_t& event)
             {
-                if (event.reacting_user.id == stoull(botID)) return;
-
-                string channelName = GetChannelName(to_string(event.channel_id));
-                string username = GetUsername(to_string(event.reacting_user.id));
-                string emojiName;
-
-                if (event.reacting_emoji.id != 0) //custom emoji with an ID
+                if (event.reacting_user.id == stoull(botID))
                 {
-                    emojiName = GetReactionName(to_string(event.reacting_emoji.id), to_string(event.reacting_guild->id));
-                }
-                else //standard Unicode emoji
-                {
-                    emojiName = event.reacting_emoji.name;
+                    return;
                 }
 
-                string cleanedMessage = "[EVENT] Reaction added to a message in channel " + channelName + " by " + username + " with emoji: " + emojiName;
-                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                GetChannelName(to_string(event.channel_id), [event](const string& channelName)
+                    {
+                        GetUsername(to_string(event.reacting_user.id), [event, channelName](const string& username)
+                            {
+                                if (event.reacting_emoji.id != 0) //custom emoji with an ID
+                                {
+                                    GetReactionName(to_string(event.reacting_emoji.id), to_string(event.reacting_guild->id), [event, channelName, username](const string& emojiName)
+                                        {
+                                            string cleanedMessage = "[EVENT] Reaction added to a message in channel " + channelName + " by " + username + " with emoji: " + emojiName;
+                                            BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                                        });
+                                }
+                                else //standard Unicode emoji
+                                {
+                                    string emojiName = event.reacting_emoji.name;
+                                    string cleanedMessage = "[EVENT] Reaction added to a message in channel " + channelName + " by " + username + " with emoji: " + emojiName;
+                                    BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                                }
+                            });
+                    });
             });
 
         //a user or bot removed a reaction from a message
         bot->on_message_reaction_remove([](const dpp::message_reaction_remove_t& event)
             {
-                string channelName = GetChannelName(to_string(event.channel_id));
-                string username = GetUsername(to_string(event.reacting_user_id));
-                string emojiName;
-
-                if (event.reacting_emoji.id != 0) //custom emoji with an ID
-                {
-                    emojiName = GetReactionName(to_string(event.reacting_emoji.id), to_string(event.reacting_guild->id));
-                }
-                else //standard Unicode emoji
-                {
-                    emojiName = event.reacting_emoji.name;
-                }
-
-                string cleanedMessage = "[EVENT] Reaction removed from a message in channel " + channelName + " by " + username + " with emoji: " + emojiName;
-                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                GetChannelName(to_string(event.channel_id), [event](const string& channelName)
+                    {
+                        GetUsername(to_string(event.reacting_user_id), [event, channelName](const string& username)
+                            {
+                                if (event.reacting_emoji.id != 0) //custom emoji with an ID
+                                {
+                                    GetReactionName(to_string(event.reacting_emoji.id), to_string(event.reacting_guild->id), [event, channelName, username](const string& emojiName)
+                                        {
+                                            string cleanedMessage = "[EVENT] Reaction removed from a message in channel " + channelName + " by " + username + " with emoji: " + emojiName;
+                                            BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                                        });
+                                }
+                                else //standard Unicode emoji
+                                {
+                                    string emojiName = event.reacting_emoji.name;
+                                    string cleanedMessage = "[EVENT] Reaction removed from a message in channel " + channelName + " by " + username + " with emoji: " + emojiName;
+                                    BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                                }
+                            });
+                    });
             });
 
         //a user or bot started typing
         bot->on_typing_start([](const dpp::typing_start_t& event)
             {
-                string channelName = GetChannelName(to_string(event.typing_channel->id));
-                string username = GetUsername(to_string(event.user_id));
-                string cleanedMessage = "[EVENT] " + username + " started typing in channel " + channelName;
-                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                GetChannelName(to_string(event.typing_channel->id), [event](const string& channelName)
+                    {
+                        GetUsername(to_string(event.user_id), [event, channelName](const string& username)
+                            {
+                                string cleanedMessage = "[EVENT] " + username + " started typing in channel " + channelName;
+                                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                            });
+                    });
             });
 
         //a user or bot joined a server
         bot->on_guild_member_add([](const dpp::guild_member_add_t& event)
             {
-                string username = GetUsername(to_string(event.added.user_id));
-                string guildName = GetGuildName(to_string(event.adding_guild->id));
-                string cleanedMessage = "[MEMBER] " + username + " joined the guild: " + guildName;
-                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                GetUsername(to_string(event.added.user_id), [event](const string& username)
+                    {
+                        GetGuildName(to_string(event.adding_guild->id), [event, username](const string& guildName)
+                            {
+                                string cleanedMessage = "[MEMBER] " + username + " joined the guild: " + guildName;
+                                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                            });
+                    });
             });
 
         //a user or bot left a server
         bot->on_guild_member_remove([](const dpp::guild_member_remove_t& event)
             {
-                string username = GetUsername(to_string(event.removed.id));
-                string guildName = GetGuildName(to_string(event.removing_guild->id));
-                string cleanedMessage = "[MEMBER] " + username + " left or was removed from the guild: " + guildName;
-                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                GetUsername(to_string(event.removed.id), [event](const string& username)
+                    {
+                        GetGuildName(to_string(event.removing_guild->id), [event, username](const string& guildName)
+                            {
+                                string cleanedMessage = "[MEMBER] " + username + " left or was removed from the guild: " + guildName;
+                                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                            });
+                    });
             });
 
         //a user or bot server profile was updated
         bot->on_guild_member_update([](const dpp::guild_member_update_t& event)
             {
-                string username = GetUsername(to_string(event.updated.user_id));
-                string guildName = GetGuildName(to_string(event.updating_guild->id));
-                string cleanedMessage = "[MEMBER] Server profile updated for user " + username + " in guild: " + guildName;
-                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                GetUsername(to_string(event.updated.user_id), [event](const string& username)
+                    {
+                        GetGuildName(to_string(event.updating_guild->id), [event, username](const string& guildName)
+                            {
+                                string cleanedMessage = "[MEMBER] Server profile updated for user " + username + " in guild: " + guildName;
+                                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                            });
+                    });
             });
 
         //a user or bot global profile was updated
         bot->on_user_update([](const dpp::user_update_t& event)
             {
-                string username = GetUsername(to_string(event.updated.id));
-                string cleanedMessage = "[USER] Global profile updated for user " + username;
-                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                GetUsername(to_string(event.updated.id), [event](const string& username)
+                    {
+                        string cleanedMessage = "[USER] Global profile updated for user " + username;
+                        BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                    });
             });
 
         //a user was banned
         bot->on_guild_ban_add([](const dpp::guild_ban_add_t& event)
             {
-                string username = GetUsername(to_string(event.banned.id));
-                string guildName = GetGuildName(to_string(event.banning_guild->id));
-                string cleanedMessage = "[BAN] User " + username + " was banned from guild: " + guildName;
-                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                GetUsername(to_string(event.banned.id), [event](const string& username)
+                    {
+                        GetGuildName(to_string(event.banning_guild->id), [event, username](const string& guildName)
+                            {
+                                string cleanedMessage = "[BAN] User " + username + " was banned from guild: " + guildName;
+                                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                            });
+                    });
             });
 
         //a user was unbanned
         bot->on_guild_ban_remove([](const dpp::guild_ban_remove_t& event)
             {
-                string username = GetUsername(to_string(event.unbanned.id));
-                string guildName = GetGuildName(to_string(event.unbanning_guild->id));
-                string cleanedMessage = "[BAN] User " + username + " was unbanned from guild: " + guildName;
-                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                GetUsername(to_string(event.unbanned.id), [event](const string& username)
+                    {
+                        GetGuildName(to_string(event.unbanning_guild->id), [event, username](const string& guildName)
+                            {
+                                string cleanedMessage = "[BAN] User " + username + " was unbanned from guild: " + guildName;
+                                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                            });
+                    });
             });
+
+
 
         //
         // DPP AND DISCORD OPCODES AND SESSION MESSAGES
@@ -425,98 +575,144 @@ namespace Core
             });
 	}
 
-    string BotMechanics::GetChannelName(const string& channelID)
+    void BotMechanics::GetGuildName(const string& guildID, function<void(const string&)> callback)
     {
-        promise<string> promise;
-        future<string> future = promise.get_future();
-
-        dpp::snowflake dppChannelID = stoull(channelID);
-
-        bot->channel_get(dppChannelID, [&promise](const dpp::confirmation_callback_t& event)
-            {
-                if (!event.is_error())
-                {
-                    dpp::channel channel = get<dpp::channel>(event.value);
-                    promise.set_value(channel.name);
-                }
-                else
-                {
-                    promise.set_value("Unknown Channel");
-                }
-            });
-
-        return future.get();
-    }
-
-    string BotMechanics::GetUsername(const string& userID)
-    {
-        promise<string> promise;
-        future<string> future = promise.get_future();
-
-        dpp::snowflake dppUserID = stoull(userID);
-
-        bot->user_get(dppUserID, [&promise](const dpp::confirmation_callback_t& event)
-            {
-                if (!event.is_error() 
-                    && holds_alternative<dpp::user>(event.value))
-                {
-                    dpp::user user = get<dpp::user>(event.value);
-                    promise.set_value(user.username);
-                }
-                else
-                {
-                    promise.set_value("Unknown Username");
-                }
-            });
-
-        return future.get();
-    }
-
-    string BotMechanics::GetGuildName(const string& guildID)
-    {
-        promise<string> promise;
-        future<string> future = promise.get_future();
-
         dpp::snowflake dppGuildID = stoull(guildID);
-
-        bot->guild_get(dppGuildID, [&promise](const dpp::confirmation_callback_t& event)
-            {
-                if (!event.is_error())
+        dpp::guild* guild = dpp::find_guild(dppGuildID);
+        if (guild)
+        {
+            //guild is in cache, invoke callback immediately
+            callback(guild->name);
+        }
+        else
+        {
+            //fetch guild from API asynchronously
+            bot->guild_get(dppGuildID, [callback](const dpp::confirmation_callback_t& event)
                 {
-                    dpp::guild guild = get<dpp::guild>(event.value);
-                    promise.set_value(guild.name);
-                }
-                else
-                {
-                    promise.set_value("Unknown Guild");
-                }
-            });
-
-        return future.get();
+                    if (!event.is_error())
+                    {
+                        dpp::guild guild = get<dpp::guild>(event.value);
+                        //the guild should now be in the cache
+                        callback(guild.name);
+                    }
+                    else
+                    {
+                        callback("Unknown Guild");
+                    }
+                });
+        }
     }
 
-    string BotMechanics::GetReactionName(const string& reactionID, const string& guildID)
+    void BotMechanics::GetChannelName(const string& channelID, function<void(const string&)> callback)
     {
-        promise<string> promise;
-        future<string> future = promise.get_future();
+        dpp::snowflake dppChannelID = stoull(channelID);
+        dpp::channel* channel = dpp::find_channel(dppChannelID);
+        if (channel)
+        {
+            //channel is in cache, invoke callback immediately
+            callback(channel->name);
+        }
+        else
+        {
+            //fetch channel from API asynchronously
+            bot->channel_get(dppChannelID, [callback](const dpp::confirmation_callback_t& event)
+                {
+                    if (!event.is_error())
+                    {
+                        dpp::channel channel = get<dpp::channel>(event.value);
+                        //the channel should now be in the cache
+                        callback(channel.name);
+                    }
+                    else
+                    {
+                        callback("Unknown Channel");
+                    }
+                });
+        }
+    }
 
+    void BotMechanics::GetUsername(const string& userID, function<void(const string&)> callback)
+    {
+        dpp::snowflake dppUserID = stoull(userID);
+        dpp::user* user = dpp::find_user(dppUserID);
+        if (user)
+        {
+            //user is in cache, invoke callback immediately
+            callback(user->username);
+        }
+        else
+        {
+            //fetch user from API asynchronously
+            bot->user_get(dppUserID, [callback](const dpp::confirmation_callback_t& event)
+                {
+                    //inside the lambda, 'callback' is captured and can be used
+                    if (!event.is_error())
+                    {
+                        dpp::user_identified user = get<dpp::user_identified>(event.value);
+                        //the user should now be in the cache
+                        callback(user.username);
+                    }
+                    else
+                    {
+                        callback("Unknown User");
+                    }
+                });
+        }
+    }
+
+    void BotMechanics::GetReactionName(const string& reactionID, const string& guildID, function<void(const string&)> callback)
+    {
         dpp::snowflake dppReactionID = stoull(reactionID);
         dpp::snowflake dppGuildID = stoull(guildID);
 
-        bot->guild_emoji_get(dppGuildID, dppReactionID, [&promise](const dpp::confirmation_callback_t& event)
+        dpp::guild* guild = dpp::find_guild(dppGuildID);
+        if (guild)
+        {
+            //iterate over the emoji IDs in the guild
+            for (const auto& emoji_id : guild->emojis)
+            {
+                if (emoji_id == dppReactionID)
+                {
+                    //fetch the emoji object using the ID
+                    dpp::emoji* emoji = dpp::find_emoji(emoji_id);
+                    if (emoji)
+                    {
+                        callback(emoji->name);
+                    }
+                    else
+                    {
+                        //fetch from API if not in cache
+                        bot->guild_emoji_get(dppGuildID, emoji_id, [callback](const dpp::confirmation_callback_t& event)
+                            {
+                                if (!event.is_error())
+                                {
+                                    dpp::emoji emoji = get<dpp::emoji>(event.value);
+                                    callback(emoji.name);
+                                }
+                                else
+                                {
+                                    callback("Unknown Reaction");
+                                }
+                            });
+                    }
+                    return;
+                }
+            }
+        }
+
+        //if emoji not found in guild emojis, fetch it from the API
+        bot->guild_emoji_get(dppGuildID, dppReactionID, [callback](const dpp::confirmation_callback_t& event)
             {
                 if (!event.is_error())
                 {
                     dpp::emoji emoji = get<dpp::emoji>(event.value);
-                    promise.set_value(emoji.name);
+                    callback(emoji.name);
                 }
                 else
                 {
-                    promise.set_value("Unknown Reaction");
+                    callback("Unknown Reaction");
                 }
             });
-
-        return future.get();
     }
 
 	void BotMechanics::SendDiscordMessage(const string& channelID, const string& message)

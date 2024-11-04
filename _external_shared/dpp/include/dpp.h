@@ -32,10 +32,7 @@
 #include <vector>
 #include <map>
 #include <functional>
-#pragma warning(push)
-#pragma warning(disable : 26495)
 #include <dpp/include/exception.h>
-#pragma warning(pop)
 #include <dpp/include/snowflake.h>
 #include <dpp/include/misc-enum.h>
 #include <dpp/include/stringops.h>

@@ -22,10 +22,7 @@
 #pragma once
 #include <dpp/include/export.h>
 #include <dpp/include/json_fwd.h>
-#pragma warning(push)
-#pragma warning(disable : 26495)
 #include <dpp/include/exception.h>
-#pragma warning(pop)
 #include <cstdint>
 #include <type_traits>
 

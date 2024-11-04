@@ -23,10 +23,7 @@
 #include <dpp/include/snowflake.h>
 #include <future>
 #include <utility>
-#pragma warning(push)
-#pragma warning(disable : 26800 26819 26495)
 #include <dpp/include/exception.h>
-#pragma warning(pop)
 
 namespace dpp {
 

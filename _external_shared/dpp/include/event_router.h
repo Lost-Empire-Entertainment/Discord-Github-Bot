@@ -33,10 +33,7 @@
 #include <shared_mutex>
 #include <cstring>
 #include <atomic>
-#pragma warning(push)
-#pragma warning(disable : 26495)
 #include <dpp/include/exception.h>
-#pragma warning(pop)
 #include <dpp/include/coro/job.h>
 #include <dpp/include/coro/task.h>
 

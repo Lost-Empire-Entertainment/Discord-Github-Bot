@@ -21,17 +21,11 @@ namespace Core
 		static inline string logChannelID;
 		static inline string botID;
 
+		static inline unordered_map<string, string> userMap;
+
 		static void Initialize();
 
 		static void SendDiscordMessage(const string& channelID, const string& message);
-
-		static void BotAction_DMUser(const string& userID, const string& message);
-		static void BotAction_MessageUser(const string& userID, const string& channelID, const string& message);
-		static void BotAction_MuteUser(const string& userID, int time, const string& reason = "");
-		static void BotAction_UnmuteUser(const string& userID, const string& reason = "");
-		static void BotAction_KickUser(const string& userID, const string& reason = "");
-		static void BotAction_BanUser(const string& userID, int time, const string& reason = "");
-		static void BotAction_UnbanUser(const string& userID, const string& reason = "");
 
 		static void Shutdown();
 	private:

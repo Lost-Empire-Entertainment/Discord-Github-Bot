@@ -21,7 +21,10 @@
 
 #pragma once
 #include <dpp/include/export.h>
+#pragma warning(push)
+#pragma warning(disable : 26800 26819)
 #include <dpp/include/json.h>
+#pragma warning(pop)
 
 namespace dpp {
 

@@ -17,18 +17,32 @@ namespace Graphics::GUI
 	{
 	public:
 		static inline bool isImguiInitialized;
+		static inline bool renderBotAdminActionWindow;
 
 		static void Initialize();
 		static void Run();
 
 		static int GetScreenHeight();
 		static int GetScreenWidth();
+		static ImVec2 CenterWindow(ImVec2 windowSize);
 
 		static void RenderParentWindow();
 
 		static void RenderConsole(ImVec2 windowSize);
 		static void RenderRightSideInteractions(ImVec2 windowSize);
 		static void ListUsers(ImVec2 windowSize);
+
+		enum class BotAction
+		{
+			dm,
+			message,
+			mute,
+			kick,
+			ban
+		};
+		static inline string actionTargetUserID;
+		static inline BotAction botAction;
+		static void BotAdminActionWindow();
 
 		enum class MessageTarget
 		{
@@ -39,8 +53,7 @@ namespace Graphics::GUI
 		};
 		static void Print(
 			const string& message, 
-			MessageTarget messageTarget = MessageTarget::both, 
-			int newLineCount = 0,
+			MessageTarget messageTarget = MessageTarget::both,
 			bool logInServer = false,
 			string logChannelID = "");
 

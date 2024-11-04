@@ -24,7 +24,9 @@ namespace Core
 		static inline unordered_map<string, string> userMap;
 
 		static void Initialize();
+
 		static void SendDiscordMessage(const string& channelID, const string& message);
+
 		static void Shutdown();
 	private:
 		static inline unordered_map<string, string> messageCache;

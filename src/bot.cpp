@@ -131,7 +131,7 @@ namespace Core
                 GetGuildName(to_string(event.created->id), [event](const string& guildName)
                     {
                         string cleanedMessage = "[GUILD] Bot has joined the guild: " + guildName;
-                        BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                        BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, true, logChannelID);
                     });
             });
 
@@ -141,7 +141,7 @@ namespace Core
                 GetGuildName(to_string(event.guild_id), [event](const string& guildName)
                     {
                         string cleanedMessage = "[GUILD] Bot was removed from the guild: " + guildName;
-                        BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                        BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, true, logChannelID);
                     });
             });
 
@@ -151,7 +151,7 @@ namespace Core
                 GetGuildName(to_string(event.updated->id), [event](const string& guildName)
                     {
                         string cleanedMessage = "[GUILD] Guild information updated for: " + guildName;
-                        BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                        BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, true, logChannelID);
                     });
             });
 
@@ -161,7 +161,7 @@ namespace Core
                 GetChannelName(to_string(event.created->id), [event](const string& channelName)
                     {
                         string cleanedMessage = "[CHANNEL] New channel created: " + channelName;
-                        BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                        BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, true, logChannelID);
                     });
             });
 
@@ -171,7 +171,7 @@ namespace Core
                 GetChannelName(to_string(event.deleted.id), [event](const string& channelName)
                     {
                         string cleanedMessage = "[CHANNEL] Channel deleted: " + channelName;
-                        BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                        BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, true, logChannelID);
                     });
             });
 
@@ -181,7 +181,7 @@ namespace Core
                 GetGuildName(to_string(event.guild_id), [event](const string& guildName)
                     {
                         string cleanedMessage = "[CHANNEL] Voice server updated in guild: " + guildName;
-                        BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                        BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, true, logChannelID);
                     });
             });
 
@@ -255,7 +255,7 @@ namespace Core
                                 }
 
                                 string cleanedMessage = "[CHANNEL] Voice state updated for user " + username + ". " + updateDetails;
-                                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, true, logChannelID);
                             });
                     });
             });
@@ -295,7 +295,7 @@ namespace Core
                             {
                                 string cleanedMessage = "[EVENT] New message created in channel " + channelName + " by " + username +
                                     "\nContent: " + messageContent;
-                                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, true, logChannelID);
                             });
                     });
             });
@@ -339,7 +339,7 @@ namespace Core
                                 string cleanedMessage = "[EVENT] Message edited in channel " + channelName + " by " + username +
                                     "\nOld content: " + oldMessageContent +
                                     "\nNew content: " + newMessageContent;
-                                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, true, logChannelID);
                             });
                     });
             });
@@ -370,7 +370,7 @@ namespace Core
                     {
                         string cleanedMessage = "[EVENT] Message deleted in channel " + channelName +
                             "\nContent: " + messageContent;
-                        BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                        BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, true, logChannelID);
                     });
             });
 
@@ -391,14 +391,14 @@ namespace Core
                                     GetReactionName(to_string(event.reacting_emoji.id), to_string(event.reacting_guild->id), [event, channelName, username](const string& emojiName)
                                         {
                                             string cleanedMessage = "[EVENT] Reaction added to a message in channel " + channelName + " by " + username + " with emoji: " + emojiName;
-                                            BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                                            BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, true, logChannelID);
                                         });
                                 }
                                 else //standard Unicode emoji
                                 {
                                     string emojiName = event.reacting_emoji.name;
                                     string cleanedMessage = "[EVENT] Reaction added to a message in channel " + channelName + " by " + username + " with emoji: " + emojiName;
-                                    BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                                    BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, true, logChannelID);
                                 }
                             });
                     });
@@ -416,14 +416,14 @@ namespace Core
                                     GetReactionName(to_string(event.reacting_emoji.id), to_string(event.reacting_guild->id), [event, channelName, username](const string& emojiName)
                                         {
                                             string cleanedMessage = "[EVENT] Reaction removed from a message in channel " + channelName + " by " + username + " with emoji: " + emojiName;
-                                            BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                                            BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, true, logChannelID);
                                         });
                                 }
                                 else //standard Unicode emoji
                                 {
                                     string emojiName = event.reacting_emoji.name;
                                     string cleanedMessage = "[EVENT] Reaction removed from a message in channel " + channelName + " by " + username + " with emoji: " + emojiName;
-                                    BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                                    BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, true, logChannelID);
                                 }
                             });
                     });
@@ -437,7 +437,7 @@ namespace Core
                         GetUsername(to_string(event.user_id), [event, channelName](const string& username)
                             {
                                 string cleanedMessage = "[EVENT] " + username + " started typing in channel " + channelName;
-                                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, true, logChannelID);
                             });
                     });
             });
@@ -450,7 +450,7 @@ namespace Core
                         GetGuildName(to_string(event.adding_guild->id), [event, username](const string& guildName)
                             {
                                 string cleanedMessage = "[MEMBER] " + username + " joined the guild: " + guildName;
-                                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, true, logChannelID);
                             });
                     });
             });
@@ -463,7 +463,7 @@ namespace Core
                         GetGuildName(to_string(event.removing_guild->id), [event, username](const string& guildName)
                             {
                                 string cleanedMessage = "[MEMBER] " + username + " left or was removed from the guild: " + guildName;
-                                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, true, logChannelID);
                             });
                     });
             });
@@ -476,7 +476,7 @@ namespace Core
                         GetGuildName(to_string(event.updating_guild->id), [event, username](const string& guildName)
                             {
                                 string cleanedMessage = "[MEMBER] Server profile updated for user " + username + " in guild: " + guildName;
-                                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, true, logChannelID);
                             });
                     });
             });
@@ -487,7 +487,7 @@ namespace Core
                 GetUsername(to_string(event.updated.id), [event](const string& username)
                     {
                         string cleanedMessage = "[USER] Global profile updated for user " + username;
-                        BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                        BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, true, logChannelID);
                     });
             });
 
@@ -499,7 +499,7 @@ namespace Core
                         GetGuildName(to_string(event.banning_guild->id), [event, username](const string& guildName)
                             {
                                 string cleanedMessage = "[BAN] User " + username + " was banned from guild: " + guildName;
-                                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, true, logChannelID);
                             });
                     });
             });
@@ -512,7 +512,7 @@ namespace Core
                         GetGuildName(to_string(event.unbanning_guild->id), [event, username](const string& guildName)
                             {
                                 string cleanedMessage = "[BAN] User " + username + " was unbanned from guild: " + guildName;
-                                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, 0, true, logChannelID);
+                                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, true, logChannelID);
                             });
                     });
             });

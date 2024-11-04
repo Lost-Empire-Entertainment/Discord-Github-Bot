@@ -11,6 +11,7 @@
 #pragma warning(push, 0) //start dpp warning ignore
 #include "dpp/include/dpp.h"
 #pragma warning(pop) //end dpp warning ignore
+#include "magic_enum.hpp"
 
 //bot
 #include "gui.hpp"
@@ -105,6 +106,20 @@ namespace Graphics::GUI
 		return height;
 	}
 
+	ImVec2 BotGUI::CenterWindow(ImVec2 size)
+	{
+		int intWidth, intHeight;
+		glfwGetFramebufferSize(Render::window, &intWidth, &intHeight);
+
+		float glfwWindowWidth = static_cast<float>(intWidth);
+		float glfwWindowHeight = static_cast<float>(intHeight);
+
+		float posX = (glfwWindowWidth - size.x) / 2.0f;
+		float posY = (glfwWindowHeight - size.y) / 2.0f;
+
+		return ImVec2(posX, posY);
+	}
+
 	void BotGUI::RenderParentWindow()
 	{
 		int width = GetScreenWidth();
@@ -142,6 +157,8 @@ namespace Graphics::GUI
 
 			ImGui::End();
 		}
+
+		if (renderBotAdminActionWindow) BotAdminActionWindow();
 	}
 
 	void BotGUI::RenderConsole(ImVec2 windowSize)
@@ -215,23 +232,33 @@ namespace Graphics::GUI
 					{
 						if (ImGui::MenuItem("DM"))
 						{
-							BotGUI::Print("[ADMIN ACTION] DMed " + userName);
+							botAction = BotAction::dm;
+							actionTargetUserID = userID;
+							renderBotAdminActionWindow = true;
 						}
 						if (ImGui::MenuItem("Message in channel"))
 						{
-							BotGUI::Print("[ADMIN ACTION] Server-messaged " + userName);
+							botAction = BotAction::message;
+							actionTargetUserID = userID;
+							renderBotAdminActionWindow = true;
 						}
 						if (ImGui::MenuItem("Mute"))
 						{
-							BotGUI::Print("[ADMIN ACTION] Muted " + userName);
+							botAction = BotAction::mute;
+							actionTargetUserID = userID;
+							renderBotAdminActionWindow = true;
 						}
 						if (ImGui::MenuItem("Kick"))
 						{
-							BotGUI::Print("[ADMIN ACTION] Kicked " + userName);
+							botAction = BotAction::kick;
+							actionTargetUserID = userID;
+							renderBotAdminActionWindow = true;
 						}
 						if (ImGui::MenuItem("Ban"))
 						{
-							BotGUI::Print("[ADMIN ACTION] Banned " + userName);
+							botAction = BotAction::ban;
+							actionTargetUserID = userID;
+							renderBotAdminActionWindow = true;
 						}
 						ImGui::EndPopup();
 					}
@@ -241,10 +268,64 @@ namespace Graphics::GUI
 		ImGui::EndChild();
 	}
 
+	void BotGUI::BotAdminActionWindow()
+	{
+		ImVec2 windowSize = ImVec2(500.0f, 300.0f);
+		ImGui::SetNextWindowSize(windowSize, ImGuiCond_Appearing);
+
+		ImVec2 windowPos = CenterWindow(windowSize);
+		ImGui::SetNextWindowPos(ImVec2(windowPos), ImGuiCond_Appearing);
+
+		ImGuiWindowFlags flags =
+			ImGuiWindowFlags_NoResize
+			| ImGuiWindowFlags_NoDocking
+			| ImGuiWindowFlags_NoCollapse
+			| ImGuiWindowFlags_NoSavedSettings;
+
+		string action = string(magic_enum::enum_name(botAction));
+		string title = "Bot action: " + action;
+		if (ImGui::Begin(title.c_str()), nullptr, flags)
+		{
+			if (ImGui::Button("Accept"))
+			{
+				string username;
+				auto it = BotMechanics::userMap.find(actionTargetUserID);
+
+				if (it != BotMechanics::userMap.end()) username = it->second;
+
+				switch (botAction)
+				{
+				case BotAction::dm:
+					BotGUI::Print("[ADMIN ACTION] DMed " + username);
+					renderBotAdminActionWindow = false;
+					break;
+				case BotAction::message:
+					BotGUI::Print("[ADMIN ACTION] Server-messaged " + username);
+					renderBotAdminActionWindow = false;
+					break;
+				case BotAction::mute:
+					BotGUI::Print("[ADMIN ACTION] Muted " + username);
+					renderBotAdminActionWindow = false;
+					break;
+				case BotAction::kick:
+					BotGUI::Print("[ADMIN ACTION] Kicked " + username);
+					renderBotAdminActionWindow = false;
+					break;
+				case BotAction::ban:
+					BotGUI::Print("[ADMIN ACTION] Banned " + username);
+					renderBotAdminActionWindow = false;
+					break;
+				}
+			}
+			if (ImGui::Button("Close")) renderBotAdminActionWindow = false;
+
+			ImGui::End();
+		}
+	}
+
 	void BotGUI::Print(
 		const string& message, 
-		MessageTarget messageTarget, 
-		int newLineCount,
+		MessageTarget messageTarget,
 		bool logInServer,
 		string logChannelID)
 	{
@@ -260,25 +341,6 @@ namespace Graphics::GUI
 			|| messageTarget == MessageTarget::consoleOnly)
 		{
 			output.emplace_back(message);
-		}
-
-		//prints new lines to cmd and console
-		if (newLineCount != 0)
-		{
-			for (int i = 0; i < newLineCount; ++i)
-			{
-				if (messageTarget == MessageTarget::both
-					|| messageTarget == MessageTarget::cmdOnly)
-				{
-					cout << "\n";
-				}
-
-				if (messageTarget == MessageTarget::both
-					|| messageTarget == MessageTarget::consoleOnly)
-				{
-					output.emplace_back("");
-				}
-			}
 		}
 
 		//should this message also be printed in the server?

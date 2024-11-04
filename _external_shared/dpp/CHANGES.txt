@@ -15,3 +15,15 @@ Changes:
 - copied dpp.dll and dpp.lib from DPP-10.3.34/build/library/Release to the root folder
 - copied all the header files from DPP-10.3.34/include/dpp into a new empty include folder and deleted everything else
 - replaced dpp/ with dpp/include in all dpp source files that had dpp/ in its #include
+
+- disabled warnings CS26800 and CS26819 at 'permissions.h' and 'json_interface.h' with
+	#pragma warning(push)
+	#pragma warning(disable : 26800 26819)
+	#include <dpp/include/json.h>
+	#pragma warning(pop)
+	
+- disabled warning CS26495 at 'sync.h', 'snowflake.h', 'event_router.h' and 'dpp.h' with
+	#pragma warning(push)
+	#pragma warning(disable : 26495)
+	#include <dpp/include/exception.h>
+	#pragma warning(pop)

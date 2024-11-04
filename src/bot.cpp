@@ -83,40 +83,6 @@ namespace Core
 		{
 			bot->start(false);
 		});
-
-        if (userMap.empty())
-        {
-            bot->guild_get_members(guildID, 1000, 0, [](const dpp::confirmation_callback_t& event) 
-            {
-                if (event.is_error()) 
-                {
-                    BotGUI::Print("Error fetching guild members!");
-                    return;
-                }
-
-                userMap.clear();
-
-                bot->on_guild_members_chunk([&](const dpp::guild_members_chunk_t& chunk) 
-                    {
-                    if (chunk.members) 
-                    {
-                        //dereference the pointer to access the map
-                        for (const auto& [user_id, guild_member] : *chunk.members) 
-                        {
-                            const auto* user = guild_member.get_user();
-                            if (user)
-                            {
-                                userMap[std::to_string(user->id)] = user->username;
-                                BotGUI::Print("Received chunked user: " + user->username);
-                            }
-                        }
-                    }
-                    else BotGUI::Print("Warning: Received chunk with null members pointer.");
-                    });
-
-                BotGUI::Print("Fetched " + to_string(userMap.size()) + " users.");
-                });
-        }
 	}
 
 	void BotMechanics::BotMessageEvents()
@@ -429,19 +395,6 @@ namespace Core
                     });
             });
 
-        //a user or bot started typing
-        bot->on_typing_start([](const dpp::typing_start_t& event)
-            {
-                GetChannelName(to_string(event.typing_channel->id), [event](const string& channelName)
-                    {
-                        GetUsername(to_string(event.user_id), [event, channelName](const string& username)
-                            {
-                                string cleanedMessage = "[EVENT] " + username + " started typing in channel " + channelName;
-                                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, true, logChannelID);
-                            });
-                    });
-            });
-
         //a user or bot joined a server
         bot->on_guild_member_add([](const dpp::guild_member_add_t& event)
             {
@@ -516,8 +469,6 @@ namespace Core
                             });
                     });
             });
-
-
 
         //
         // DPP AND DISCORD OPCODES AND SESSION MESSAGES
@@ -762,6 +713,103 @@ namespace Core
 
         BotGUI::Print(message);
 	}
+
+    bool BotMechanics::UserExists(const string& userID, bool forceCurrentServer)
+    {
+        //checks if user field is digits-only
+        if (!all_of(userID.begin(), userID.end(), ::isdigit))
+        {
+            BotGUI::Print("Error: userID " + userID + " must not contain anything other than digits!");
+            return false;
+        }
+
+        //if the user has to be in our guild for the search function to work
+        if (forceCurrentServer)
+        {
+            dpp::user* foundUser = dpp::find_user(stoull(userID));
+
+            //if user with id was not found
+            if (foundUser == nullptr)
+            {
+                BotGUI::Print("Error: User with ID " + userID + " does not exist!");
+                return false;
+            }
+            else
+            {
+                //checks if user is in our server or not
+                bot->guild_get_member(guildID, stoull(userID), [userID](const dpp::confirmation_callback_t& callback)
+                    {
+                        if (callback.is_error())
+                        {
+                            BotGUI::Print("Error: User with ID " + userID + " is not in the guild!");
+                            return false;
+                        }
+                        else
+                        {
+                            auto& guild_member = get<dpp::guild_member>(callback.value);
+                            BotGUI::targetUsername = guild_member.get_user()->username;
+                            BotGUI::targetUserID = userID;
+
+                            BotGUI::Print("Successfully found user '" + BotGUI::targetUsername + "'.");
+
+                            return true;
+                        }
+                    });
+            }
+        }
+
+        return true;
+    }
+
+    void BotMechanics::BotAction_DMUser(const string& userID, const string& message)
+    {
+        dpp::snowflake uid = stoull(userID);
+        dpp::message dmMessage;
+        dmMessage.set_content(message);
+
+        bot->direct_message_create(
+            uid,        //user ID
+            dmMessage,  //message content as dpp::message
+            [botPtr = bot.get()](const dpp::confirmation_callback_t& callback)
+            {
+                if (callback.is_error())
+                {
+                    BotGUI::Print("Failed to send DM: " + callback.get_error().message);
+                    return;
+                }
+            }
+        );
+    }
+
+    void BotMechanics::BotAction_MessageUser(const string& userID, const string& channelID, const string& message)
+    {
+
+    }
+
+    void BotMechanics::BotAction_MuteUser(const string& userID, int time, const string& reason)
+    {
+
+    }
+
+    void BotMechanics::BotAction_UnmuteUser(const string& userID, const string& reason)
+    {
+
+    }
+
+    void BotMechanics::BotAction_KickUser(const string& userID, const string& reason)
+    {
+
+    }
+
+    void BotMechanics::BotAction_BanUser(const string& userID, int time, const string& reason)
+    {
+
+    }
+
+    void BotMechanics::BotAction_UnbanUser(const string& userID, const string& reason)
+    {
+
+    }
 
 	void BotMechanics::Shutdown()
 	{

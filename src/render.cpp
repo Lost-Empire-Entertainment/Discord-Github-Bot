@@ -38,7 +38,7 @@ namespace Graphics
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-		BotGUI::Print("GLFW initialized successfully!", BotGUI::MessageTarget::cmdOnly, 1);
+		BotGUI::Print("GLFW initialized successfully!", BotGUI::MessageTarget::cmdOnly);
 	}
 
 	void Render::WindowSetup()
@@ -76,7 +76,7 @@ namespace Graphics
 
 		glfwSetWindowCloseCallback(window, [](GLFWwindow* window) { Bot::Shutdown(); });
 
-		BotGUI::Print("Window initialized successfully!", BotGUI::MessageTarget::cmdOnly, 1);
+		BotGUI::Print("Window initialized successfully!", BotGUI::MessageTarget::cmdOnly);
 	}
 
 	void Render::GladSetup()
@@ -89,7 +89,7 @@ namespace Graphics
 			Bot::CreateErrorPopup("Failed to initialize GLAD!");
 		}
 
-		BotGUI::Print("GLAD initialized successfully!", BotGUI::MessageTarget::cmdOnly, 1);
+		BotGUI::Print("GLAD initialized successfully!", BotGUI::MessageTarget::cmdOnly);
 	}
 
 	void Render::UpdateAfterRescale(GLFWwindow* window, int width, int height)

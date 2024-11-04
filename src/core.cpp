@@ -68,7 +68,7 @@ namespace Core
 		string finalExeName = exeName != "" ? exeName : "Bot";
 		string finalVersion = version != "" ? version : "1.0.0";
 
-		BotGUI::Print("Initializing " + finalExeName + " " + finalVersion + "...", BotGUI::MessageTarget::cmdOnly, 1);
+		BotGUI::Print("Initializing " + finalExeName + " " + finalVersion + "...", BotGUI::MessageTarget::cmdOnly);
 
 		//
 		// SET DOCUMENTS PATH
@@ -124,7 +124,7 @@ namespace Core
 
 			configFilePath = docsPath + "\\config.txt";
 
-			BotGUI::Print("config file path: " + configFilePath, BotGUI::MessageTarget::cmdOnly, 1);
+			BotGUI::Print("config file path: " + configFilePath, BotGUI::MessageTarget::cmdOnly);
 
 			ConfigFile::LoadData();
 		}
@@ -229,7 +229,7 @@ namespace Core
 	void Bot::Run()
 	{
 		BotGUI::Print("Reached render loop...", BotGUI::MessageTarget::both);
-		BotGUI::Print("==============================", BotGUI::MessageTarget::both, 1);
+		BotGUI::Print("==============================", BotGUI::MessageTarget::both);
 
 		isBotRunning = true;
 

@@ -30,7 +30,7 @@ namespace Graphics::GUI
 
 		static void RenderConsole(ImVec2 windowSize);
 		static void RenderRightSideInteractions(ImVec2 windowSize);
-		static void ListUsers(ImVec2 windowSize);
+		static void UserActions(ImVec2 windowSize);
 
 		enum class BotAction
 		{
@@ -40,8 +40,9 @@ namespace Graphics::GUI
 			kick,
 			ban
 		};
-		static inline string actionTargetUserID;
 		static inline BotAction botAction;
+		static inline string targetUserID;
+		static inline string targetUsername;
 		static void BotAdminActionWindow();
 
 		enum class MessageTarget
@@ -60,6 +61,10 @@ namespace Graphics::GUI
 		static void Shutdown();
 	private:
 		static inline bool firstScrollToBottom;
+
+		static inline char usernameTextBuffer[64];
+		static inline char messageTextBuffer[128];
+
 		static inline vector<string> output;
 		static inline vector<string> storedLogs;
 	};

@@ -148,7 +148,7 @@ namespace Graphics::GUI
 
 			//top right panel takes 40% height and 45% width - 25.0f margin for right edge
 			ImVec2 userListSize = ImVec2(width * 0.45f - 25.0f, height * 0.4f);
-			ListUsers(userListSize);
+			UserActions(userListSize);
 
 			//bottom right panel takes 60% height and 45% width - 25.0f margin for right edge
 			ImGui::SetCursorPos(ImVec2(width * 0.55f + 15.0f, userListSize.y + 15.0f));
@@ -217,52 +217,60 @@ namespace Graphics::GUI
 		ImGui::EndChild();
 	}
 
-	void BotGUI::ListUsers(ImVec2 windowSize)
+	void BotGUI::UserActions(ImVec2 windowSize)
 	{
 		ImVec2 scrollingRegionSize(windowSize.x, windowSize.y);
-		if (ImGui::BeginChild("users", scrollingRegionSize, true))
+		if (ImGui::BeginChild("userActions", scrollingRegionSize, true))
 		{
-			if (ImGui::CollapsingHeader("Users", ImGuiTreeNodeFlags_DefaultOpen))
-			{
-				for (const auto& [userID, userName] : BotMechanics::userMap)
-				{
-					ImGui::BulletText("%s", userName.c_str());
+			ImGui::Text("Search for user by ID");
 
-					if (ImGui::BeginPopupContextItem(userID.c_str()))
+			ImGui::InputText(
+				"##username",
+				usernameTextBuffer,
+				sizeof(usernameTextBuffer));
+
+			if (ImGui::Button("Search"))
+			{
+				if (usernameTextBuffer[0] == '\0')
+				{
+					Print("Error: User search field cannot be empty!");
+				}
+				else
+				{
+					if (BotMechanics::UserExists(usernameTextBuffer))
 					{
-						if (ImGui::MenuItem("DM"))
-						{
-							botAction = BotAction::dm;
-							actionTargetUserID = userID;
-							renderBotAdminActionWindow = true;
-						}
-						if (ImGui::MenuItem("Message in channel"))
-						{
-							botAction = BotAction::message;
-							actionTargetUserID = userID;
-							renderBotAdminActionWindow = true;
-						}
-						if (ImGui::MenuItem("Mute"))
-						{
-							botAction = BotAction::mute;
-							actionTargetUserID = userID;
-							renderBotAdminActionWindow = true;
-						}
-						if (ImGui::MenuItem("Kick"))
-						{
-							botAction = BotAction::kick;
-							actionTargetUserID = userID;
-							renderBotAdminActionWindow = true;
-						}
-						if (ImGui::MenuItem("Ban"))
-						{
-							botAction = BotAction::ban;
-							actionTargetUserID = userID;
-							renderBotAdminActionWindow = true;
-						}
-						ImGui::EndPopup();
+						targetUserID = usernameTextBuffer;
 					}
 				}
+			}
+
+			ImGui::Separator();
+			ImGui::Text("Actions");
+
+			if (ImGui::Button("DM"))
+			{
+				botAction = BotAction::dm;
+				renderBotAdminActionWindow = true;
+			}
+			if (ImGui::Button("Message in channel"))
+			{
+				botAction = BotAction::message;
+				renderBotAdminActionWindow = true;
+			}
+			if (ImGui::Button("Mute"))
+			{
+				botAction = BotAction::mute;
+				renderBotAdminActionWindow = true;
+			}
+			if (ImGui::Button("Kick"))
+			{
+				botAction = BotAction::kick;
+				renderBotAdminActionWindow = true;
+			}
+			if (ImGui::Button("Ban"))
+			{
+				botAction = BotAction::ban;
+				renderBotAdminActionWindow = true;
 			}
 		}
 		ImGui::EndChild();
@@ -286,37 +294,100 @@ namespace Graphics::GUI
 		string title = "Bot action: " + action;
 		if (ImGui::Begin(title.c_str()), nullptr, flags)
 		{
+			switch (botAction)
+			{
+			case BotAction::dm:
+				ImGui::InputText(
+					"Message",
+					messageTextBuffer,
+					sizeof(messageTextBuffer));
+
+				break;
+			case BotAction::message:
+				break;
+			case BotAction::mute:
+				break;
+			case BotAction::kick:
+				break;
+			case BotAction::ban:
+				break;
+			}
+
 			if (ImGui::Button("Accept"))
 			{
-				string username;
-				auto it = BotMechanics::userMap.find(actionTargetUserID);
-
-				if (it != BotMechanics::userMap.end()) username = it->second;
-
 				switch (botAction)
 				{
 				case BotAction::dm:
-					BotGUI::Print("[ADMIN ACTION] DMed " + username);
-					renderBotAdminActionWindow = false;
+					if (usernameTextBuffer[0] == '\0'
+						|| messageTextBuffer[0] == '\0')
+					{
+						Print("Error: Username or message field is empty!");
+					}
+					else
+					{
+						BotMechanics::BotAction_DMUser(targetUserID, messageTextBuffer);
+						BotGUI::Print("[ADMIN ACTION] DMed '" + targetUsername + "' with message '" + messageTextBuffer + "'.");
+
+						messageTextBuffer[0] = '\0';
+
+						renderBotAdminActionWindow = false;
+					}
 					break;
 				case BotAction::message:
-					BotGUI::Print("[ADMIN ACTION] Server-messaged " + username);
-					renderBotAdminActionWindow = false;
+					if (usernameTextBuffer[0] == '\0'
+						|| messageTextBuffer[0] == '\0')
+					{
+						Print("Error: Username or message field is empty!");
+					}
+					else
+					{
+						BotMechanics::BotAction_DMUser(targetUserID, messageTextBuffer);
+						BotGUI::Print("[ADMIN ACTION] Server-messaged '" + targetUsername + "' with message '" + messageTextBuffer + "'.");
+
+						messageTextBuffer[0] = '\0';
+
+						renderBotAdminActionWindow = false;
+					}
 					break;
 				case BotAction::mute:
-					BotGUI::Print("[ADMIN ACTION] Muted " + username);
-					renderBotAdminActionWindow = false;
+					if (usernameTextBuffer[0] == '\0')
+					{
+						Print("Error: Username is empty!");
+					}
+					else
+					{
+						BotGUI::Print("[ADMIN ACTION] Muted " + targetUsername);
+
+						renderBotAdminActionWindow = false;
+					}
 					break;
 				case BotAction::kick:
-					BotGUI::Print("[ADMIN ACTION] Kicked " + username);
-					renderBotAdminActionWindow = false;
+					if (usernameTextBuffer[0] == '\0')
+					{
+						Print("Error: Username is empty!");
+					}
+					else
+					{
+						BotGUI::Print("[ADMIN ACTION] Kicked " + targetUsername);
+
+						renderBotAdminActionWindow = false;
+					}
 					break;
 				case BotAction::ban:
-					BotGUI::Print("[ADMIN ACTION] Banned " + username);
-					renderBotAdminActionWindow = false;
+					if (usernameTextBuffer[0] == '\0')
+					{
+						Print("Error: Username is empty!");
+					}
+					else
+					{
+						BotGUI::Print("[ADMIN ACTION] Banned " + targetUsername);
+
+						renderBotAdminActionWindow = false;
+					}
 					break;
 				}
 			}
+
 			if (ImGui::Button("Close")) renderBotAdminActionWindow = false;
 
 			ImGui::End();
@@ -329,25 +400,27 @@ namespace Graphics::GUI
 		bool logInServer,
 		string logChannelID)
 	{
+		string newMessage = message + "\n";
+
 		//prints to external cmd console
 		if (messageTarget == MessageTarget::both
 			|| messageTarget == MessageTarget::cmdOnly)
 		{
-			cout << message << "\n";
+			cout << newMessage << "\n";
 		}
 
 		//prints to executable gui console
 		if (messageTarget == MessageTarget::both
 			|| messageTarget == MessageTarget::consoleOnly)
 		{
-			output.emplace_back(message);
+			output.emplace_back(newMessage);
 		}
 
 		//should this message also be printed in the server?
 		if (logInServer)
 		{
 			if (logChannelID == "") Print("Error: Cannot log in channel if no valid channel ID has been assigned!");
-			else BotMechanics::SendDiscordMessage(logChannelID, message);
+			else BotMechanics::SendDiscordMessage(logChannelID, newMessage);
 		}
 	}
 

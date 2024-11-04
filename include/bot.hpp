@@ -17,8 +17,11 @@ namespace Core
 	class BotMechanics
 	{
 	public:
+		static inline string guildID;
 		static inline string logChannelID;
 		static inline string botID;
+
+		static inline unordered_map<string, string> userMap;
 
 		static void Initialize();
 		static void SendDiscordMessage(const string& channelID, const string& message);

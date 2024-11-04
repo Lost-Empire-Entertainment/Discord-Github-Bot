@@ -40,6 +40,12 @@ namespace Core
 			Bot::CreateErrorPopup("Failed to get discord bot token from env file! Did you forget to add the DISCORD_BOT_TOKEN variable?");
 		}
 
+        guildID = Bot::GetEnv("DISCORD_GUILD_ID");
+        if (guildID == "")
+        {
+            Bot::CreateErrorPopup("Failed to get discord guild id from env file! Did you forget to add the DISCORD_GUILD_ID variable?");
+        }
+
 		logChannelID = Bot::GetEnv("DISCORD_LOG_CHANNEL_ID");
 		if (logChannelID == "")
 		{
@@ -77,6 +83,40 @@ namespace Core
 		{
 			bot->start(false);
 		});
+
+        if (userMap.empty())
+        {
+            bot->guild_get_members(guildID, 1000, 0, [](const dpp::confirmation_callback_t& event) 
+            {
+                if (event.is_error()) 
+                {
+                    BotGUI::Print("Error fetching guild members!");
+                    return;
+                }
+
+                userMap.clear();
+
+                bot->on_guild_members_chunk([&](const dpp::guild_members_chunk_t& chunk) 
+                    {
+                    if (chunk.members) 
+                    {
+                        //dereference the pointer to access the map
+                        for (const auto& [user_id, guild_member] : *chunk.members) 
+                        {
+                            const auto* user = guild_member.get_user();
+                            if (user)
+                            {
+                                userMap[std::to_string(user->id)] = user->username;
+                                BotGUI::Print("Received chunked user: " + user->username);
+                            }
+                        }
+                    }
+                    else BotGUI::Print("Warning: Received chunk with null members pointer.");
+                    });
+
+                BotGUI::Print("Fetched " + to_string(userMap.size()) + " users.");
+                });
+        }
 	}
 
 	void BotMechanics::BotMessageEvents()

@@ -20,6 +20,7 @@
 #include "bot.hpp"
 
 using std::cout;
+using std::to_string;
 
 using Core::Bot;
 using Graphics::Render;
@@ -124,12 +125,19 @@ namespace Graphics::GUI
 
 		if (ImGui::Begin("##Main", NULL, windowFlags))
 		{
+			//left panel takes full height and 55% width
 			ImVec2 leftChildSize = ImVec2(width * 0.55f, height - 20.0f);
 			RenderConsole(leftChildSize);
 
 			ImGui::SameLine();
 
-			ImVec2 rightChildSize = ImVec2(width * 0.45f - 25.0f, height - 20.0f);
+			//top right panel takes 40% height and 45% width - 25.0f margin for right edge
+			ImVec2 userListSize = ImVec2(width * 0.45f - 25.0f, height * 0.4f);
+			ListUsers(userListSize);
+
+			//bottom right panel takes 60% height and 45% width - 25.0f margin for right edge
+			ImGui::SetCursorPos(ImVec2(width * 0.55f + 15.0f, userListSize.y + 15.0f));
+			ImVec2 rightChildSize = ImVec2(width * 0.45f - 27.0f, height * 0.6f - 27.0f);
 			RenderRightSideInteractions(rightChildSize);
 
 			ImGui::End();
@@ -189,6 +197,47 @@ namespace Graphics::GUI
 			}
 		}
 
+		ImGui::EndChild();
+	}
+
+	void BotGUI::ListUsers(ImVec2 windowSize)
+	{
+		ImVec2 scrollingRegionSize(windowSize.x, windowSize.y);
+		if (ImGui::BeginChild("users", scrollingRegionSize, true))
+		{
+			if (ImGui::CollapsingHeader("Users", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				for (const auto& [userID, userName] : BotMechanics::userMap)
+				{
+					ImGui::BulletText("%s", userName.c_str());
+
+					if (ImGui::BeginPopupContextItem(userID.c_str()))
+					{
+						if (ImGui::MenuItem("DM"))
+						{
+							BotGUI::Print("[ADMIN ACTION] DMed " + userName);
+						}
+						if (ImGui::MenuItem("Message in channel"))
+						{
+							BotGUI::Print("[ADMIN ACTION] Server-messaged " + userName);
+						}
+						if (ImGui::MenuItem("Mute"))
+						{
+							BotGUI::Print("[ADMIN ACTION] Muted " + userName);
+						}
+						if (ImGui::MenuItem("Kick"))
+						{
+							BotGUI::Print("[ADMIN ACTION] Kicked " + userName);
+						}
+						if (ImGui::MenuItem("Ban"))
+						{
+							BotGUI::Print("[ADMIN ACTION] Banned " + userName);
+						}
+						ImGui::EndPopup();
+					}
+				}
+			}
+		}
 		ImGui::EndChild();
 	}
 

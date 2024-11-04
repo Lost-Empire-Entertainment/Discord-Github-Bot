@@ -25,8 +25,10 @@ namespace Graphics::GUI
 		static int GetScreenWidth();
 
 		static void RenderParentWindow();
+
 		static void RenderConsole(ImVec2 windowSize);
 		static void RenderRightSideInteractions(ImVec2 windowSize);
+		static void ListUsers(ImVec2 windowSize);
 
 		enum class MessageTarget
 		{

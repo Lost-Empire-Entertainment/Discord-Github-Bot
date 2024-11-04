@@ -192,7 +192,12 @@ namespace Graphics::GUI
 		ImGui::EndChild();
 	}
 
-	void BotGUI::Print(const string& message, MessageTarget messageTarget, int newLineCount)
+	void BotGUI::Print(
+		const string& message, 
+		MessageTarget messageTarget, 
+		int newLineCount,
+		bool logInServer,
+		string logChannelID)
 	{
 		//prints to external cmd console
 		if (messageTarget == MessageTarget::both
@@ -225,6 +230,13 @@ namespace Graphics::GUI
 					output.emplace_back("");
 				}
 			}
+		}
+
+		//should this message also be printed in the server?
+		if (logInServer)
+		{
+			if (logChannelID == "") Print("Error: Cannot log in channel if no valid channel ID has been assigned!");
+			else BotMechanics::SendDiscordMessage(logChannelID, message);
 		}
 	}
 

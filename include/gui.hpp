@@ -32,9 +32,15 @@ namespace Graphics::GUI
 		{
 			both,
 			cmdOnly,
-			consoleOnly
+			consoleOnly,
+			serverLogOnly
 		};
-		static void Print(const string& message, MessageTarget messageTarget = MessageTarget::both, int newLineCount = 0);
+		static void Print(
+			const string& message, 
+			MessageTarget messageTarget = MessageTarget::both, 
+			int newLineCount = 0,
+			bool logInServer = false,
+			string logChannelID = "");
 
 		static void Shutdown();
 	private:

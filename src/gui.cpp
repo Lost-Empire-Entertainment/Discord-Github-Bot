@@ -221,10 +221,7 @@ namespace Graphics::GUI
 				}
 				else
 				{
-					if (BotMechanics::UserExists(usernameTextBuffer))
-					{
-						targetUserID = usernameTextBuffer;
-					}
+					BotMechanics::FindUser(usernameTextBuffer);
 				}
 			}
 
@@ -244,10 +241,7 @@ namespace Graphics::GUI
 				}
 				else
 				{
-					if (BotMechanics::ChannelExists(channelTextBuffer))
-					{
-						targetChannelID = channelTextBuffer;
-					}
+					BotMechanics::FindChannel(channelTextBuffer);
 				}
 			}
 
@@ -267,10 +261,7 @@ namespace Graphics::GUI
 				}
 				else
 				{
-					if (BotMechanics::RoleExists(roleTextBuffer))
-					{
-						targetRoleID = roleTextBuffer;
-					}
+					BotMechanics::FindRole(roleTextBuffer);
 				}
 			}
 
@@ -382,9 +373,11 @@ namespace Graphics::GUI
 				{
 				case BotAction::dm:
 					if (usernameTextBuffer[0] == '\0'
-						|| messageTextBuffer[0] == '\0')
+						|| messageTextBuffer[0] == '\0'
+						|| targetUserID == ""
+						|| targetUsername == "")
 					{
-						Print("Error: Username or message field is empty!");
+						Print("Error: Cannot send bot message to user because user or message field is empty!");
 					}
 					else
 					{
@@ -399,14 +392,25 @@ namespace Graphics::GUI
 					if (channelTextBuffer[0] == '\0'
 						|| messageTextBuffer[0] == '\0')
 					{
-						Print("Error: Channel or message field is empty!");
+						Print("Error: Cannot send bot message to channel because channel or message field is empty!");
 						break;
 					}
 
 					if (tagUser
-						&& messageTextBuffer[0] == '\0')
+						&& (usernameTextBuffer[0] == '\0'
+						|| targetUsername == ""
+						|| targetUserID == ""))
 					{
-						Print("Error: User field is empty!");
+						Print("Error: Cannot send user-tagged bot message to channel because user field is empty!");
+						break;
+					}
+
+					if (tagRole
+						&& (roleTextBuffer[0] == '\0'
+						|| targetUsername == ""
+						|| targetUserID == ""))
+					{
+						Print("Error: Cannot send role-tagged bot message to channel because user or role field is empty!");
 						break;
 					}
 

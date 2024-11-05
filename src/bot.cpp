@@ -3,7 +3,6 @@
 #include <memory>
 #include <iostream>
 #include <thread>
-#include <future>
 
 //external
 #pragma warning(push, 0) //start dpp warning ignore
@@ -20,8 +19,6 @@ using std::make_unique;
 using std::cout;
 using std::thread;
 using std::stoull;
-using std::future;
-using std::promise;
 using std::to_string;
 
 using Graphics::GUI::BotGUI;
@@ -261,7 +258,7 @@ namespace Core
                             {
                                 string cleanedMessage = "[EVENT] New message created in channel " + channelName + " by " + username +
                                     "\nContent: " + messageContent;
-                                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly, true, logChannelID);
+                                BotGUI::Print(cleanedMessage, BotGUI::MessageTarget::serverLogOnly);
                             });
                     });
             });
@@ -706,59 +703,12 @@ namespace Core
             });
     }
 
-    bool BotMechanics::UserExists(const string& userID, bool forceCurrentServer)
-    {
-        //checks if user ID is digits-only
-        if (!all_of(userID.begin(), userID.end(), ::isdigit))
-        {
-            BotGUI::Print("Error: User ID " + userID + " must not contain anything other than digits!");
-            return false;
-        }
-
-        //if the user has to be in our guild for the search function to work
-        if (forceCurrentServer)
-        {
-            dpp::user* foundUser = dpp::find_user(stoull(userID));
-
-            //if user with id was not found
-            if (foundUser == nullptr)
-            {
-                BotGUI::Print("Error: User with ID " + userID + " does not exist!");
-                return false;
-            }
-            else
-            {
-                //checks if user is in our server or not
-                bot->guild_get_member(guildID, stoull(userID), [userID](const dpp::confirmation_callback_t& callback)
-                    {
-                        if (callback.is_error())
-                        {
-                            BotGUI::Print("Error: User with ID " + userID + " is not in the guild!");
-                            return false;
-                        }
-                        else
-                        {
-                            auto& guild_member = get<dpp::guild_member>(callback.value);
-                            BotGUI::AssignChannelData(userID, guild_member.get_user()->username);
-
-                            BotGUI::Print("Successfully found user '" + guild_member.get_user()->username + "'.");
-
-                            return true;
-                        }
-                    });
-            }
-        }
-
-        return true;
-    }
-
-    bool BotMechanics::ChannelExists(const string& channelID)
+    void BotMechanics::FindChannel(const string& channelID)
     {
         //checks if channel id is digits-only
         if (!all_of(channelID.begin(), channelID.end(), ::isdigit))
         {
             BotGUI::Print("Error: Channel ID " + channelID + " must not contain anything other than digits!");
-            return false;
         }
 
         dpp::snowflake cid = stoull(channelID);
@@ -775,8 +725,9 @@ namespace Core
                     auto& channel = get<dpp::channel>(callback.value);
                     if (channel.guild_id == stoull(guildID))
                     {
-                        BotGUI::AssignChannelData(channelID, channel.name);
-                        BotGUI::Print("Successfully found channel '" + channel.name + "' in the current guild.");
+                        BotGUI::targetChannelID = channelID;
+                        BotGUI::targetChannelName = channel.name;
+                        BotGUI::Print("Successfully found channel '" + BotGUI::targetChannelName + "' in the current guild.");
                     }
                     else
                     {
@@ -784,17 +735,53 @@ namespace Core
                     }
                 }
             });
-
-        return true;
     }
 
-    bool BotMechanics::RoleExists(const string& roleID)
+    void BotMechanics::FindUser(const string& userID, bool forceCurrentServer)
+    {
+        //checks if user ID is digits-only
+        if (!all_of(userID.begin(), userID.end(), ::isdigit))
+        {
+            BotGUI::Print("Error: User ID " + userID + " must not contain anything other than digits!");
+        }
+
+        //if the user has to be in our guild for the search function to work
+        if (forceCurrentServer)
+        {
+            dpp::user* foundUser = dpp::find_user(stoull(userID));
+
+            //if user with id was not found
+            if (foundUser == nullptr)
+            {
+                BotGUI::Print("Error: User with ID " + userID + " does not exist!");
+            }
+            else
+            {
+                //checks if user is in our server or not
+                bot->guild_get_member(guildID, stoull(userID), [userID](const dpp::confirmation_callback_t& callback)
+                    {
+                        if (callback.is_error())
+                        {
+                            BotGUI::Print("Error: User with ID " + userID + " is not in the guild!");
+                        }
+                        else
+                        {
+                            auto& guild_member = get<dpp::guild_member>(callback.value);
+                            BotGUI::targetUserID = userID;
+                            BotGUI::targetUsername = guild_member.get_user()->username;
+                            BotGUI::Print("Successfully found user '" + BotGUI::targetUsername + "'.");
+                        }
+                    });
+            }
+        }
+    }
+
+    void BotMechanics::FindRole(const string& roleID)
     {
         //checks if role id is digits-only
         if (!all_of(roleID.begin(), roleID.end(), ::isdigit))
         {
             BotGUI::Print("Error: Role ID " + roleID + " must not contain anything other than digits!");
-            return false;
         }
 
         dpp::snowflake rid = stoull(roleID);
@@ -812,8 +799,9 @@ namespace Core
                     auto it = roles.find(rid);
                     if (it != roles.end())
                     {
-                        BotGUI::AssignRoleData(roleID, it->second.name);
-                        BotGUI::Print("Successfully found role '" + it->second.name + "' in the current guild.");
+                        BotGUI::targetRoleID = roleID;
+                        BotGUI::targetRoleName = it->second.name;
+                        BotGUI::Print("Successfully found role '" + BotGUI::targetRoleName + "' in the current guild.");
                     }
                     else
                     {
@@ -821,8 +809,6 @@ namespace Core
                     }
                 }
             });
-
-        return true;
     }
 
     void BotMechanics::BotAction_DMUser(const string& userID, const string& message)

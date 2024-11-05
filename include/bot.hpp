@@ -23,9 +23,9 @@ namespace Core
 
 		static void Initialize();
 
-		static bool UserExists(const string& userID, bool forceCurrentServer = true);
-		static bool ChannelExists(const string& channelID);
-		static bool RoleExists(const string& roleID);
+		static void FindChannel(const string& channelID);
+		static void FindUser(const string& userID, bool forceCurrentServer = true);
+		static void FindRole(const string& roleID);
 
 		static void BotAction_DMUser(const string& userID, const string& message);
 		static void BotAction_MessageChannel(

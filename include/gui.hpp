@@ -35,16 +35,13 @@ namespace Graphics::GUI
 		static inline bool tagUser;
 		static inline string targetUserID;
 		static inline string targetUsername;
-		static void AssignUserData(const string& id, const string& name) { targetUserID = id; targetUsername = name; }
 
 		static inline string targetChannelID;
 		static inline string targetChannelName;
-		static void AssignChannelData(const string& id, const string& name) { targetChannelID = id; targetChannelName = name; }
 
 		static inline bool tagRole;
 		static inline string targetRoleID;
 		static inline string targetRoleName;
-		static void AssignRoleData(const string& id, const string& name) { targetRoleID = id; targetRoleName = name; }
 
 		enum class BotAction
 		{

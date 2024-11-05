@@ -29,8 +29,22 @@ namespace Graphics::GUI
 		static void RenderParentWindow();
 
 		static void RenderConsole(ImVec2 windowSize);
-		static void RenderRightSideInteractions(ImVec2 windowSize);
-		static void UserActions(ImVec2 windowSize);
+		static void RenderDiscordContent(ImVec2 windowSize);
+		static void RenderGithubContent(ImVec2 windowSize);
+
+		static inline bool tagUser;
+		static inline string targetUserID;
+		static inline string targetUsername;
+		static void AssignUserData(const string& id, const string& name) { targetUserID = id; targetUsername = name; }
+
+		static inline string targetChannelID;
+		static inline string targetChannelName;
+		static void AssignChannelData(const string& id, const string& name) { targetChannelID = id; targetChannelName = name; }
+
+		static inline bool tagRole;
+		static inline string targetRoleID;
+		static inline string targetRoleName;
+		static void AssignRoleData(const string& id, const string& name) { targetRoleID = id; targetRoleName = name; }
 
 		enum class BotAction
 		{
@@ -41,9 +55,7 @@ namespace Graphics::GUI
 			ban
 		};
 		static inline BotAction botAction;
-		static inline string targetUserID;
-		static inline string targetUsername;
-		static void BotAdminActionWindow();
+		static void RenderBotActionWindow();
 
 		enum class MessageTarget
 		{
@@ -63,6 +75,8 @@ namespace Graphics::GUI
 		static inline bool firstScrollToBottom;
 
 		static inline char usernameTextBuffer[64];
+		static inline char channelTextBuffer[64];
+		static inline char roleTextBuffer[64];
 		static inline char messageTextBuffer[128];
 
 		static inline vector<string> output;

@@ -140,25 +140,25 @@ namespace Graphics::GUI
 
 		if (ImGui::Begin("##Main", NULL, windowFlags))
 		{
-			//left panel takes full height and 55% width
+			//console panel
 			ImVec2 leftChildSize = ImVec2(width * 0.55f, height - 20.0f);
 			RenderConsole(leftChildSize);
 
 			ImGui::SameLine();
 
-			//top right panel takes 40% height and 45% width - 25.0f margin for right edge
-			ImVec2 userListSize = ImVec2(width * 0.45f - 25.0f, height * 0.4f);
-			UserActions(userListSize);
+			//discord content panel
+			ImVec2 discordContent = ImVec2(width * 0.45f - 25.0f, height * 0.4f);
+			RenderDiscordContent(discordContent);
 
-			//bottom right panel takes 60% height and 45% width - 25.0f margin for right edge
-			ImGui::SetCursorPos(ImVec2(width * 0.55f + 15.0f, userListSize.y + 15.0f));
-			ImVec2 rightChildSize = ImVec2(width * 0.45f - 27.0f, height * 0.6f - 27.0f);
-			RenderRightSideInteractions(rightChildSize);
+			//github content panel
+			ImGui::SetCursorPos(ImVec2(width * 0.55f + 15.0f, discordContent.y + 15.0f));
+			ImVec2 githubContent = ImVec2(width * 0.45f - 27.0f, height * 0.6f - 27.0f);
+			RenderGithubContent(githubContent);
 
 			ImGui::End();
 		}
 
-		if (renderBotAdminActionWindow) BotAdminActionWindow();
+		if (renderBotAdminActionWindow) RenderBotActionWindow();
 	}
 
 	void BotGUI::RenderConsole(ImVec2 windowSize)
@@ -166,7 +166,7 @@ namespace Graphics::GUI
 		ImVec2 scrollingRegionSize(
 			windowSize.x,
 			windowSize.y);
-		if (ImGui::BeginChild("left", scrollingRegionSize, true))
+		if (ImGui::BeginChild("##child_console", scrollingRegionSize, true))
 		{
 			float wrapWidth = windowSize.x - 10;
 			ImGui::PushTextWrapPos(ImGui::GetCursorPos().x + wrapWidth);
@@ -200,36 +200,20 @@ namespace Graphics::GUI
 		ImGui::EndChild();
 	}
 
-	void BotGUI::RenderRightSideInteractions(ImVec2 windowSize)
-	{
-		ImVec2 scrollingRegionSize(
-			windowSize.x,
-			windowSize.y);
-		if (ImGui::BeginChild("right", scrollingRegionSize, true))
-		{
-			if (ImGui::Button("linux sux"))
-			{
-				string channelID = "1264625286054412350";
-				BotMechanics::SendDiscordMessage(channelID, "linux sux");
-			}
-		}
-
-		ImGui::EndChild();
-	}
-
-	void BotGUI::UserActions(ImVec2 windowSize)
+	void BotGUI::RenderDiscordContent(ImVec2 windowSize)
 	{
 		ImVec2 scrollingRegionSize(windowSize.x, windowSize.y);
-		if (ImGui::BeginChild("userActions", scrollingRegionSize, true))
+		if (ImGui::BeginChild("##child_discord_content", scrollingRegionSize, true))
 		{
 			ImGui::Text("Search for user by ID");
 
 			ImGui::InputText(
-				"##username",
+				"##input_search_user",
 				usernameTextBuffer,
 				sizeof(usernameTextBuffer));
 
-			if (ImGui::Button("Search"))
+			ImGui::SameLine();
+			if (ImGui::Button("Search##button_search_user"))
 			{
 				if (usernameTextBuffer[0] == '\0')
 				{
@@ -244,15 +228,61 @@ namespace Graphics::GUI
 				}
 			}
 
+			ImGui::Text("Search for channel by ID");
+
+			ImGui::InputText(
+				"##input_search_channel",
+				channelTextBuffer,
+				sizeof(channelTextBuffer));
+
+			ImGui::SameLine();
+			if (ImGui::Button("Search##button_search_channel"))
+			{
+				if (channelTextBuffer[0] == '\0')
+				{
+					Print("Error: Channel search field cannot be empty!");
+				}
+				else
+				{
+					if (BotMechanics::ChannelExists(channelTextBuffer))
+					{
+						targetChannelID = channelTextBuffer;
+					}
+				}
+			}
+
+			ImGui::Text("Search for role by ID");
+
+			ImGui::InputText(
+				"##input_search_role",
+				roleTextBuffer,
+				sizeof(roleTextBuffer));
+
+			ImGui::SameLine();
+			if (ImGui::Button("Search##button_search_role"))
+			{
+				if (roleTextBuffer[0] == '\0')
+				{
+					Print("Error: Role search field cannot be empty!");
+				}
+				else
+				{
+					if (BotMechanics::RoleExists(roleTextBuffer))
+					{
+						targetRoleID = roleTextBuffer;
+					}
+				}
+			}
+
 			ImGui::Separator();
 			ImGui::Text("Actions");
 
-			if (ImGui::Button("DM"))
+			if (ImGui::Button("Direct message"))
 			{
 				botAction = BotAction::dm;
 				renderBotAdminActionWindow = true;
 			}
-			if (ImGui::Button("Message in channel"))
+			if (ImGui::Button("Server message"))
 			{
 				botAction = BotAction::message;
 				renderBotAdminActionWindow = true;
@@ -276,7 +306,24 @@ namespace Graphics::GUI
 		ImGui::EndChild();
 	}
 
-	void BotGUI::BotAdminActionWindow()
+	void BotGUI::RenderGithubContent(ImVec2 windowSize)
+	{
+		ImVec2 scrollingRegionSize(
+			windowSize.x,
+			windowSize.y);
+		if (ImGui::BeginChild("right", scrollingRegionSize, true))
+		{
+			if (ImGui::Button("linux sux"))
+			{
+				string channelID = "1264625286054412350";
+				BotMechanics::BotAction_MessageChannel(channelID, "linux sux");
+			}
+		}
+
+		ImGui::EndChild();
+	}
+
+	void BotGUI::RenderBotActionWindow()
 	{
 		ImVec2 windowSize = ImVec2(500.0f, 300.0f);
 		ImGui::SetNextWindowSize(windowSize, ImGuiCond_Appearing);
@@ -294,16 +341,32 @@ namespace Graphics::GUI
 		string title = "Bot action: " + action;
 		if (ImGui::Begin(title.c_str()), nullptr, flags)
 		{
+			//close this window if it is unfocused
+			if (!ImGui::IsWindowFocused())
+			{
+				renderBotAdminActionWindow = false;
+			}
+
 			switch (botAction)
 			{
 			case BotAction::dm:
 				ImGui::InputText(
-					"Message",
+					"##action_dm_message",
 					messageTextBuffer,
 					sizeof(messageTextBuffer));
 
+				ImGui::Checkbox("Tag user", &tagUser);
+
 				break;
 			case BotAction::message:
+				ImGui::InputText(
+					"##action_server_message",
+					messageTextBuffer,
+					sizeof(messageTextBuffer));
+
+				ImGui::Checkbox("Tag user", &tagUser);
+				ImGui::Checkbox("Tag role", &tagRole);
+
 				break;
 			case BotAction::mute:
 				break;
@@ -326,7 +389,6 @@ namespace Graphics::GUI
 					else
 					{
 						BotMechanics::BotAction_DMUser(targetUserID, messageTextBuffer);
-						BotGUI::Print("[ADMIN ACTION] DMed '" + targetUsername + "' with message '" + messageTextBuffer + "'.");
 
 						messageTextBuffer[0] = '\0';
 
@@ -334,20 +396,47 @@ namespace Graphics::GUI
 					}
 					break;
 				case BotAction::message:
-					if (usernameTextBuffer[0] == '\0'
+					if (channelTextBuffer[0] == '\0'
 						|| messageTextBuffer[0] == '\0')
 					{
-						Print("Error: Username or message field is empty!");
+						Print("Error: Channel or message field is empty!");
+						break;
 					}
+
+					if (tagUser
+						&& messageTextBuffer[0] == '\0')
+					{
+						Print("Error: User field is empty!");
+						break;
+					}
+
+					//only tagged user
+					if (tagUser
+						&& !tagRole)
+					{
+						BotMechanics::BotAction_MessageChannel(targetChannelID, messageTextBuffer, targetUserID);
+					}
+					//only tagged role
+					else if (!tagUser
+							 && tagRole)
+					{
+						BotMechanics::BotAction_MessageChannel(targetChannelID, messageTextBuffer, "", targetRoleID);
+					}
+					//tagged both user and role
+					else if (tagUser
+							 && tagRole)
+					{
+						BotMechanics::BotAction_MessageChannel(targetChannelID, messageTextBuffer, targetUserID, targetRoleID);
+					}
+					//did not tag user or role
 					else
 					{
-						BotMechanics::BotAction_DMUser(targetUserID, messageTextBuffer);
-						BotGUI::Print("[ADMIN ACTION] Server-messaged '" + targetUsername + "' with message '" + messageTextBuffer + "'.");
-
-						messageTextBuffer[0] = '\0';
-
-						renderBotAdminActionWindow = false;
+						BotMechanics::BotAction_MessageChannel(targetChannelID, messageTextBuffer);
 					}
+
+					messageTextBuffer[0] = '\0';
+
+					renderBotAdminActionWindow = false;
 					break;
 				case BotAction::mute:
 					if (usernameTextBuffer[0] == '\0')
@@ -419,8 +508,8 @@ namespace Graphics::GUI
 		//should this message also be printed in the server?
 		if (logInServer)
 		{
-			if (logChannelID == "") Print("Error: Cannot log in channel if no valid channel ID has been assigned!");
-			else BotMechanics::SendDiscordMessage(logChannelID, newMessage);
+			if (logChannelID == "") Print("Error: Log channel ID has not been assigned to Print function!");
+			else BotMechanics::BotAction_MessageChannel(logChannelID, newMessage);
 		}
 	}
 

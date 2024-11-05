@@ -588,7 +588,7 @@ namespace Core
                     }
                     else
                     {
-                        callback("Unknown Guild");
+                        callback("Error: Unknown Guild");
                     }
                 });
         }
@@ -616,7 +616,7 @@ namespace Core
                     }
                     else
                     {
-                        callback("Unknown Channel");
+                        callback("Error: Unknown Channel");
                     }
                 });
         }
@@ -645,7 +645,7 @@ namespace Core
                     }
                     else
                     {
-                        callback("Unknown User");
+                        callback("Error: Unknown User");
                     }
                 });
         }
@@ -701,25 +701,17 @@ namespace Core
                 }
                 else
                 {
-                    callback("Unknown Reaction");
+                    callback("Error: Unknown Reaction");
                 }
             });
     }
 
-	void BotMechanics::SendDiscordMessage(const string& channelID, const string& message)
-	{
-		dpp::snowflake convertedChannelID = static_cast<dpp::snowflake>(stoull(channelID));
-		bot->message_create(dpp::message(convertedChannelID, message));
-
-        BotGUI::Print(message);
-	}
-
     bool BotMechanics::UserExists(const string& userID, bool forceCurrentServer)
     {
-        //checks if user field is digits-only
+        //checks if user ID is digits-only
         if (!all_of(userID.begin(), userID.end(), ::isdigit))
         {
-            BotGUI::Print("Error: userID " + userID + " must not contain anything other than digits!");
+            BotGUI::Print("Error: User ID " + userID + " must not contain anything other than digits!");
             return false;
         }
 
@@ -747,10 +739,9 @@ namespace Core
                         else
                         {
                             auto& guild_member = get<dpp::guild_member>(callback.value);
-                            BotGUI::targetUsername = guild_member.get_user()->username;
-                            BotGUI::targetUserID = userID;
+                            BotGUI::AssignChannelData(userID, guild_member.get_user()->username);
 
-                            BotGUI::Print("Successfully found user '" + BotGUI::targetUsername + "'.");
+                            BotGUI::Print("Successfully found user '" + guild_member.get_user()->username + "'.");
 
                             return true;
                         }
@@ -761,29 +752,191 @@ namespace Core
         return true;
     }
 
+    bool BotMechanics::ChannelExists(const string& channelID)
+    {
+        //checks if channel id is digits-only
+        if (!all_of(channelID.begin(), channelID.end(), ::isdigit))
+        {
+            BotGUI::Print("Error: Channel ID " + channelID + " must not contain anything other than digits!");
+            return false;
+        }
+
+        dpp::snowflake cid = stoull(channelID);
+
+        //check if the channel exists
+        bot->channel_get(cid, [channelID](const dpp::confirmation_callback_t& callback)
+            {
+                if (callback.is_error())
+                {
+                    BotGUI::Print("Error: Channel with ID " + channelID + " does not exist!");
+                }
+                else
+                {
+                    auto& channel = get<dpp::channel>(callback.value);
+                    if (channel.guild_id == stoull(guildID))
+                    {
+                        BotGUI::AssignChannelData(channelID, channel.name);
+                        BotGUI::Print("Successfully found channel '" + channel.name + "' in the current guild.");
+                    }
+                    else
+                    {
+                        BotGUI::Print("Error: Channel with ID " + channelID + " is not in the current guild!");
+                    }
+                }
+            });
+
+        return true;
+    }
+
+    bool BotMechanics::RoleExists(const string& roleID)
+    {
+        //checks if role id is digits-only
+        if (!all_of(roleID.begin(), roleID.end(), ::isdigit))
+        {
+            BotGUI::Print("Error: Role ID " + roleID + " must not contain anything other than digits!");
+            return false;
+        }
+
+        dpp::snowflake rid = stoull(roleID);
+
+        //retrieve roles for the guild and check if the role exists
+        bot->roles_get(guildID, [roleID, rid](const dpp::confirmation_callback_t& callback)
+            {
+                if (callback.is_error())
+                {
+                    BotGUI::Print("Error: Unable to retrieve roles for the guild.");
+                }
+                else
+                {
+                    const auto& roles = get<dpp::role_map>(callback.value);
+                    auto it = roles.find(rid);
+                    if (it != roles.end())
+                    {
+                        BotGUI::AssignRoleData(roleID, it->second.name);
+                        BotGUI::Print("Successfully found role '" + it->second.name + "' in the current guild.");
+                    }
+                    else
+                    {
+                        BotGUI::Print("Error: Role with ID " + roleID + " does not exist in the current guild!");
+                    }
+                }
+            });
+
+        return true;
+    }
+
     void BotMechanics::BotAction_DMUser(const string& userID, const string& message)
     {
+        if (userID == "")
+        {
+            BotGUI::Print("Error: Failed to write message to user because user ID is missing!");
+            return;
+        }
+
+        if (message == "")
+        {
+            BotGUI::Print("Error: Failed to write message to user because message content is missing!");
+            return;
+        }
+
+        string finalMessage = !BotGUI::tagUser ? message : "<@" + userID + "> " + message;
+
         dpp::snowflake uid = stoull(userID);
         dpp::message dmMessage;
-        dmMessage.set_content(message);
+        dmMessage.set_content(finalMessage);
 
         bot->direct_message_create(
             uid,        //user ID
             dmMessage,  //message content as dpp::message
-            [botPtr = bot.get()](const dpp::confirmation_callback_t& callback)
+            [botPtr = bot.get(), finalMessage](const dpp::confirmation_callback_t& callback)
             {
                 if (callback.is_error())
                 {
-                    BotGUI::Print("Failed to send DM: " + callback.get_error().message);
+                    BotGUI::Print("Error: Failed to send DM: " + callback.get_error().message);
                     return;
+                }
+                else
+                {
+                    if (!BotGUI::tagUser) BotGUI::Print("[ADMIN ACTION] Direct-messaged '" 
+                        + BotGUI::targetUsername 
+                        + "' with message '" + finalMessage + "'.");
+                    else BotGUI::Print("[ADMIN ACTION] Direct-messaged and tagged '" + BotGUI::targetUsername 
+                        + "' with message '" + finalMessage + "'.");
                 }
             }
         );
     }
 
-    void BotMechanics::BotAction_MessageUser(const string& userID, const string& channelID, const string& message)
+    void BotMechanics::BotAction_MessageChannel(
+        const string& channelID, 
+        const string& message, 
+        const string& userID,
+        const string& roleID)
     {
+        if (channelID == "")
+        {
+            BotGUI::Print("Error: Failed to write message to channel because channel ID is missing!");
+            return;
+        }
 
+        if (message == "")
+        {
+            BotGUI::Print("Error: Failed to write message to channel because message content is missing!");
+            return;
+        }
+
+        if (BotGUI::tagUser
+            && userID == "")
+        {
+            BotGUI::Print("Error: Failed to tag user in channel message because user ID is missing!");
+            return;
+        }
+
+        if (BotGUI::tagRole
+            && roleID == "")
+        {
+            BotGUI::Print("Error: Failed to tag role in channel message because role ID is missing!");
+            return;
+        }
+
+        string finalMessage = message;
+
+        //only tagged user
+        if (BotGUI::tagUser 
+            && !BotGUI::tagRole)
+        {
+            finalMessage = "<@" + userID + "> " + message;
+            BotGUI::Print("[ADMIN ACTION] Server-messaged '" + BotGUI::targetChannelName 
+                + "' with message '" + finalMessage 
+                + "' and tagged user " + BotGUI::targetUsername + ".");
+        }
+        //only tagged role
+        else if (!BotGUI::tagUser
+                 && BotGUI::tagRole)
+        {
+            finalMessage = "<@&" + roleID + "> " + message;
+            BotGUI::Print("[ADMIN ACTION] Server-messaged '" + BotGUI::targetChannelName 
+                + "' with message '" + finalMessage 
+                + "' and tagged role " + BotGUI::targetRoleName + ".");
+        }
+        //tagged both user and role
+        else if (BotGUI::tagUser 
+                 && BotGUI::tagRole)
+        {
+            finalMessage = "<@" + userID + "> <@&" + roleID + "> " + message;
+            BotGUI::Print("[ADMIN ACTION] Server-messaged '" + BotGUI::targetChannelName
+                + "' with message '" + finalMessage 
+                + "' and tagged user " + BotGUI::targetUsername
+                + " and tagged role " + BotGUI::targetRoleName + ".");
+        }
+        //did not tag user or role
+        else
+        {
+            BotGUI::Print("[ADMIN ACTION] Server-messaged '" + BotGUI::targetChannelName
+                + "' with message '" + message + "'.");
+        }
+
+        bot->message_create(dpp::message(stoull(channelID), finalMessage));
     }
 
     void BotMechanics::BotAction_MuteUser(const string& userID, int time, const string& reason)

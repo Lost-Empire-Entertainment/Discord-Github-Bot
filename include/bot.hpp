@@ -24,11 +24,15 @@ namespace Core
 		static void Initialize();
 
 		static bool UserExists(const string& userID, bool forceCurrentServer = true);
-
-		static void SendDiscordMessage(const string& channelID, const string& message);
+		static bool ChannelExists(const string& channelID);
+		static bool RoleExists(const string& roleID);
 
 		static void BotAction_DMUser(const string& userID, const string& message);
-		static void BotAction_MessageUser(const string& userID, const string& channelID, const string& message);
+		static void BotAction_MessageChannel(
+			const string& channelID, 
+			const string& message, 
+			const string& userID = "",
+			const string& roleID = "");
 		static void BotAction_MuteUser(const string& userID, int time, const string& reason = "");
 		static void BotAction_UnmuteUser(const string& userID, const string& reason = "");
 		static void BotAction_KickUser(const string& userID, const string& reason = "");

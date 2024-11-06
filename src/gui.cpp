@@ -283,6 +283,12 @@ namespace Graphics::GUI
 				botAction = BotAction::mute;
 				renderBotAdminActionWindow = true;
 			}
+			ImGui::SameLine();
+			if (ImGui::Button("Unmute"))
+			{
+				botAction = BotAction::unmute;
+				renderBotAdminActionWindow = true;
+			}
 			if (ImGui::Button("Kick"))
 			{
 				botAction = BotAction::kick;
@@ -291,6 +297,12 @@ namespace Graphics::GUI
 			if (ImGui::Button("Ban"))
 			{
 				botAction = BotAction::ban;
+				renderBotAdminActionWindow = true;
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Unban"))
+			{
+				botAction = BotAction::unban;
 				renderBotAdminActionWindow = true;
 			}
 		}
@@ -361,9 +373,13 @@ namespace Graphics::GUI
 				break;
 			case BotAction::mute:
 				break;
+			case BotAction::unmute:
+				break;
 			case BotAction::kick:
 				break;
 			case BotAction::ban:
+				break;
+			case BotAction::unban:
 				break;
 			}
 

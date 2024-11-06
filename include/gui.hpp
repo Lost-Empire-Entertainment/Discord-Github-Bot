@@ -48,8 +48,10 @@ namespace Graphics::GUI
 			dm,
 			message,
 			mute,
+			unmute,
 			kick,
-			ban
+			ban,
+			unban
 		};
 		static inline BotAction botAction;
 		static void RenderBotActionWindow();
